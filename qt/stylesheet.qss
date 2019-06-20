@@ -1,0 +1,83 @@
+QWidget{
+	font-family: roboto;
+	font-size: 12pt;
+	background-color: #FFFFFF;
+	outline: none;
+}
+
+QLabel {
+	color: #000;
+}
+
+QLabel#timeLabel {
+	margin: 30px;
+	font-size: 72pt;
+	color: #333;
+}
+
+QLabel#secondary {
+	color: #ababab;
+}
+
+QLabel#primary {
+	color: #333;
+	font-size: 22pt;
+	font: bold;
+}
+
+QLabel#leftBar {
+	color: #000;
+	margin-left: 0px;
+	padding-left: 10px;
+	border-left : 6px solid #ABABAB;
+}
+
+QPushButton { 
+	background-color: #FF1776;
+	color: #fff;
+	border-style: outset;
+	font-size: 12pt;
+	font: bold;
+	padding: 20px;
+	margin: 20px;
+	max-width: 183px;
+}
+
+QPushButton:hover { 
+	color: #fff;
+	background-color: #F51057;
+}
+
+QPushButton:checked { 
+	color: #fff;
+	background-color: #5961FF;
+}
+
+QLineEdit {
+	background: none;
+	color: #5961FF;
+	border: none;
+	min-width: 125px;
+	max-width: 125px;
+	margin: 5px;
+	border-bottom : 2px solid #5961FF;
+}
+
+QCheckBox {
+    spacing: 5px;
+	color: #000;
+}
+
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+	margin-right: 15px;
+	border: 2px solid #5961FF;
+	/*background-color: #ededed;*/
+}
+
+QCheckBox::indicator:checked {
+    width: 20px;
+    height: 20px;
+	background-color: #5961FF;
+}
