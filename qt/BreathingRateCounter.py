@@ -19,7 +19,7 @@ def butter_bandpass(lowcut, highcut, fs, order=5):
     return b, a
 
 
-def FILTR_FREQ(signal1, signal2, fs, freq_low, freq_high):
+def fourier_analysis(signal1, signal2, fs, freq_low, freq_high):
     sum_signal = []
     for i in range(0, min(len(signal1), len(signal2))):  # собираем общий сигнал из двух квадратур
         sum_signal.append(complex(signal1[i], signal2[i]))
@@ -39,7 +39,7 @@ def FILTR_FREQ(signal1, signal2, fs, freq_low, freq_high):
     return freq_max[0]
 
 
-def WHO_BIGGER(signal1, signal2, signal3, signal4):
+def find_bigger_signal(signal1, signal2, signal3, signal4):
     mean1 = 0
     mean2 = 0
     mean3 = 0
@@ -64,15 +64,15 @@ def WHO_BIGGER(signal1, signal2, signal3, signal4):
         return 1
 
 
-def BREATH_FILT(signal1, signal2, signal3, signal4):
+def breath_filter(signal1, signal2, signal3, signal4):
     order = 2
     global lowcut_br
     global highcut_br
 
-    freq_br_r1 = FILTR_FREQ(signal1, signal2, fsB, lowcut_br, highcut_br)
-    freq_br_r2 = FILTR_FREQ(signal3, signal4, fsB, lowcut_br, highcut_br)
+    freq_br_r1 = fourier_analysis(signal1, signal2, fsB, lowcut_br, highcut_br)
+    freq_br_r2 = fourier_analysis(signal3, signal4, fsB, lowcut_br, highcut_br)
     '''Находим сигнал с большей амплитудой'''
-    who = WHO_BIGGER(signal1, signal2, signal3, signal4)
+    who = find_bigger_signal(signal1, signal2, signal3, signal4)
     if who == 0:
         freq_sum = freq_br_r1
     elif who == 1:
@@ -91,14 +91,14 @@ def BREATH_FILT(signal1, signal2, signal3, signal4):
     return signalfilt_r1_1, signalfilt_r1_2, signalfilt_r2_1, signalfilt_r2_2
 
 
-def SIGNAL_WITHOUT_BREATH(sig1, sig2):
+def signal_without_breath(sig1, sig2):
     sig_res = []
     for i in range(0, min(len(sig1), len(sig2))):
         sig_res = np.append(sig_res, sig1[i] - sig2[i])
     return sig_res
 
 
-def HEART_FILT(signal_r1_1, signal_r1_2, signal_r2_1, signal_r2_2):
+def heart_filter(signal_r1_1, signal_r1_2, signal_r2_1, signal_r2_2):
     """фильтрация по широкой полосе"""
     order = 3
     global lowcut_hb
@@ -110,8 +110,8 @@ def HEART_FILT(signal_r1_1, signal_r1_2, signal_r2_1, signal_r2_2):
     signalfilt_hb_r2_1_w = signal.filtfilt(B_hb_w, A_hb_w, signal_r2_1)
     signalfilt_hb_r2_2_w = signal.filtfilt(B_hb_w, A_hb_w, signal_r2_2)
 
-    freq_hb_r1 = FILTR_FREQ(signal_r1_1, signal_r1_2, fsB, lowcut_hb, highcut_hb)
-    freq_hb_r2 = FILTR_FREQ(signal_r2_1, signal_r2_2, fsB, lowcut_hb, highcut_hb)
+    freq_hb_r1 = fourier_analysis(signal_r1_1, signal_r1_2, fsB, lowcut_hb, highcut_hb)
+    freq_hb_r2 = fourier_analysis(signal_r2_1, signal_r2_2, fsB, lowcut_hb, highcut_hb)
     freq_sum = np.mean([freq_hb_r1, freq_hb_r2])
 
     lowcut_hb = freq_sum - 0.3
@@ -129,29 +129,31 @@ def HEART_FILT(signal_r1_1, signal_r1_2, signal_r2_1, signal_r2_2):
             signalfilt_hb_r1_1_w, signalfilt_hb_r1_2_w, signalfilt_hb_r2_1_w, signalfilt_hb_r2_2_w)
 
 
-def BreathRateCounter(signal_r1_1, signal_r1_2, signal_r2_1, signal_r2_2, time):
-    """ Предварительная обработка данных """
+def breath_rate_counter(signal_r1_1, signal_r1_2, signal_r2_1, signal_r2_2, time):
+    """
+    Предварительная обработка данных
+    """
     signal_r1_1 = signal.detrend(signal_r1_1)  # удаляем тренд средней линии
     signal_r1_2 = signal.detrend(signal_r1_2)
     signal_r2_1 = signal.detrend(signal_r2_1)
     signal_r2_2 = signal.detrend(signal_r2_2)
     signalfilt_br_r1_1, signalfilt_br_r1_2, signalfilt_br_r2_1, \
-    signalfilt_br_r2_2 = BREATH_FILT(signal_r1_1, signal_r1_2, signal_r2_1, signal_r2_2)
+    signalfilt_br_r2_2 = breath_filter(signal_r1_1, signal_r1_2, signal_r2_1, signal_r2_2)
 
-    signalfilt_hb_r1_1 = SIGNAL_WITHOUT_BREATH(signal_r1_1, signalfilt_br_r1_1)
-    signalfilt_hb_r1_2 = SIGNAL_WITHOUT_BREATH(signal_r1_2, signalfilt_br_r1_2)
-    signalfilt_hb_r2_1 = SIGNAL_WITHOUT_BREATH(signal_r2_1, signalfilt_br_r2_1)
-    signalfilt_hb_r2_2 = SIGNAL_WITHOUT_BREATH(signal_r2_2, signalfilt_br_r2_2)
+    signalfilt_hb_r1_1 = signal_without_breath(signal_r1_1, signalfilt_br_r1_1)
+    signalfilt_hb_r1_2 = signal_without_breath(signal_r1_2, signalfilt_br_r1_2)
+    signalfilt_hb_r2_1 = signal_without_breath(signal_r2_1, signalfilt_br_r2_1)
+    signalfilt_hb_r2_2 = signal_without_breath(signal_r2_2, signalfilt_br_r2_2)
 
-    signalfilt_hb_r1_1, signalfilt_hb_r1_2, signalfilt_hb_r2_1, signalfilt_hb_r2_2,\
-    signalfilt_hb_r1_1_w, signalfilt_hb_r1_2_w, signalfilt_hb_r2_1_w, signalfilt_hb_r2_2_w\
-        = HEART_FILT(signalfilt_hb_r1_1, signalfilt_hb_r1_2, signalfilt_hb_r2_1, signalfilt_hb_r2_2)
+    signalfilt_hb_r1_1, signalfilt_hb_r1_2, signalfilt_hb_r2_1, signalfilt_hb_r2_2, \
+    signalfilt_hb_r1_1_w, signalfilt_hb_r1_2_w, signalfilt_hb_r2_1_w, signalfilt_hb_r2_2_w \
+        = heart_filter(signalfilt_hb_r1_1, signalfilt_hb_r1_2, signalfilt_hb_r2_1, signalfilt_hb_r2_2)
 
     '''Поиск пиков'''
-    #peaks_hb_r1_1_w = find_peaks(signalfilt_hb_r1_1_w, distance=fsB / highcut_hb)[0]
-    #peaks_hb_r1_2_w = find_peaks(signalfilt_hb_r1_2_w, distance=fsB / highcut_hb)[0]
-    #peaks_hb_r2_1_w = find_peaks(signalfilt_hb_r2_1_w, distance=fsB / highcut_hb)[0]
-    #peaks_hb_r2_2_w = find_peaks(signalfilt_hb_r2_2_w, distance=fsB / highcut_hb)[0]
+    # peaks_hb_r1_1_w = find_peaks(signalfilt_hb_r1_1_w, distance=fsB / highcut_hb)[0]
+    # peaks_hb_r1_2_w = find_peaks(signalfilt_hb_r1_2_w, distance=fsB / highcut_hb)[0]
+    # peaks_hb_r2_1_w = find_peaks(signalfilt_hb_r2_1_w, distance=fsB / highcut_hb)[0]
+    # peaks_hb_r2_2_w = find_peaks(signalfilt_hb_r2_2_w, distance=fsB / highcut_hb)[0]
 
     peaks_hb_r1_1 = find_peaks(signalfilt_hb_r1_1, distance=fsB / highcut_hb)[0]
     peaks_hb_r1_2 = find_peaks(signalfilt_hb_r1_2, distance=fsB / highcut_hb)[0]

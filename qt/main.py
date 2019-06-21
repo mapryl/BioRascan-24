@@ -57,8 +57,10 @@ mainLayout.setColumnStretch(2, 1)
 settingsLayout = QGridLayout()
 leftLayout.addLayout(settingsLayout)
 
+validator = QDoubleValidator()
 lengthSettingsText = QLabel('Длительность эксперимента')
 lengthSettingsEdit = QLineEdit()
+lengthSettingsEdit.setValidator(validator)
 lmin = QLabel('мин')
 lmin.setObjectName("secondary")
 
@@ -68,6 +70,7 @@ settingsLayout.addWidget(lmin, 0, 2)
 
 intervalLayoutText = QLabel('Интервал расчета')
 intervalLayoutEdit = QLineEdit()
+intervalLayoutEdit.setValidator(validator)
 imin = QLabel('мин')
 imin.setObjectName("secondary")
 settingsLayout.addWidget(intervalLayoutText, 1, 0)
