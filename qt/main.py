@@ -8,6 +8,26 @@ from SerialPortWriter import *
 
 import pyqtgraph as pg
 import numpy as np
+from random import randint
+
+from time import sleep
+
+class RascanWorker(QObject):
+
+    dataProcessed = pyqtSignal(int, int)
+
+    def __init__(self, parent=None):
+        super(self.__class__, self).__init__(parent)
+
+    @QtCore.pyqtSlot(list, list, list, list, list)
+    def doWork(self, a_ch0, a_ch1, a_ch20, a_ch21, T_meas):
+
+        # emulate job
+        sleep(0.5)
+        chss = randint(20, 60)
+        chd = randint(20, 60)
+
+        self.dataProcessed.emit(chss, chd)
 
 class PlotWidget(pg.GraphicsWindow):
     def __init__(self):
@@ -20,17 +40,27 @@ class PlotWidget(pg.GraphicsWindow):
         self.curve = p.plot(self.data, pen=pg.mkPen(QColor('#5961FF'), width=2))
         self.ptr = 0
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update)
-        self.timer.start(250)
+        font = QFont('roboto')
+        font.setPixelSize(20)
+        p.getAxis("bottom").tickFont = font
+        p.getAxis("bottom").setStyle(tickTextOffset=30)
+        p.getAxis("left").tickFont = font
+        p.getAxis("left").setStyle(tickTextOffset=30)
+
+        #self.timer = QTimer()
+        #self.timer.timeout.connect(self.update)
+        #self.timer.start(250)
 
     def update(self):
+        self.appendPoint(np.random.normal())
+
+    def appendPoint(self, value):
         self.data[:-1] = self.data[1:]
-        self.data[-1] = np.random.normal()
+        self.data[-1] = value
 
         self.ptr += 1
         self.curve.setData(self.data)
-        self.curve.setPos(self.ptr , 0)
+        self.curve.setPos(self.ptr, 0)
 
 class ExperimentData:
     def __init__(self):
@@ -58,6 +88,8 @@ class MainWindow(QWidget):
 
         self.initGUI()
 
+        self.createWorkerThread()
+
         self.plotWidget = PlotWidget()
         self.rightLayout.addWidget(self.plotWidget)
 
@@ -72,6 +104,15 @@ class MainWindow(QWidget):
     def onTimeUpdate(self, time):
         time = QTime.fromMSecsSinceStartOfDay(time)
         self.timeLabel.setText(time.toString())
+
+    def createWorkerThread(self):
+        self.rascanWorker = RascanWorker()
+        self.workerThread = QThread()
+        self.rascanWorker.moveToThread(self.workerThread)
+        self.workerThread.start()
+
+        self.reader.dataReady.connect(self.rascanWorker.doWork)
+        self.rascanWorker.dataProcessed.connect(self.onRascanDataProcessed)
 
     def initGUI(self):
         self.setWindowTitle('БиоРАСКАН-24')
@@ -133,9 +174,10 @@ class MainWindow(QWidget):
         chss.setObjectName('leftBar')
         infoLayout.addWidget(chss)
 
-        heartRateText = QLabel('60')
-        heartRateText.setObjectName('primary')
-        infoLayout.addWidget(heartRateText)
+        self.heartRateText = QLabel('60')
+        self.heartRateText.setObjectName('primary')
+        self.heartRateText.setAlignment(Qt.AlignRight)
+        infoLayout.addWidget(self.heartRateText)
 
         udm = QLabel('уд/мин')
         udm.setObjectName('secondary')
@@ -147,9 +189,10 @@ class MainWindow(QWidget):
         chd.setObjectName('leftBar')
         infoLayout.addWidget(chd)
 
-        breathRateText = QLabel('21')
-        breathRateText.setObjectName('primary')
-        infoLayout.addWidget(breathRateText)
+        self.breathRateText = QLabel('21')
+        self.breathRateText.setObjectName('primary')
+        self.breathRateText.setAlignment(Qt.AlignRight)
+        infoLayout.addWidget(self.breathRateText)
 
         vdm = QLabel('вдох/мин')
         vdm.setObjectName('secondary')
@@ -184,8 +227,13 @@ class MainWindow(QWidget):
     def onSaveButtonClicked(self):
         QFileDialog.getSaveFileName()
 
+    @QtCore.pyqtSlot(int, int)
+    def onRascanDataProcessed(self, chss, chd):
+        self.heartRateText.setText(str(chss))
+        self.breathRateText.setText(str(chd))
+        self.plotWidget.appendPoint(chss)
+
     def closeEvent(self, event):
-        return
         reply = QMessageBox.question(self, 'Message',
             "Вы уверены, что хотите выйти?", QMessageBox.Yes |
             QMessageBox.No, QMessageBox.No)

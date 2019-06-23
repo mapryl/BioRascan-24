@@ -23,6 +23,7 @@ QLabel#primary {
 	color: #333;
 	font-size: 22pt;
 	font: bold;
+	min-width: 60px;
 }
 
 QLabel#leftBar {
