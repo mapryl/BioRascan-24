@@ -8,26 +8,28 @@ from SerialPortWriter import *
 
 import pyqtgraph as pg
 import numpy as np
-from random import randint
 
-from time import sleep
+from BreathingRateCounter import breath_rate_counter
 
 class RascanWorker(QObject):
 
-    dataProcessed = pyqtSignal(int, int)
+    dataProcessed = pyqtSignal(float, float)
 
     def __init__(self, parent=None):
         super(self.__class__, self).__init__(parent)
 
-    @QtCore.pyqtSlot(list, list, list, list, list)
-    def doWork(self, a_ch0, a_ch1, a_ch20, a_ch21, T_meas):
+    @QtCore.pyqtSlot(list, list, int)
+    def doWork(self, a_ch0, a_ch1, t_interval):
 
-        # emulate job
-        sleep(0.5)
-        chss = randint(20, 60)
-        chd = randint(20, 60)
+        a_ch0 = np.array(a_ch0)
+        a_ch1 = np.array(a_ch1)
 
-        self.dataProcessed.emit(chss, chd)
+        a_ch0 = a_ch0 / 8000
+        a_ch1 = a_ch1 / 8000
+
+        hr, br = breath_rate_counter(a_ch0, a_ch1, t_interval)
+
+        self.dataProcessed.emit(hr, br)
 
 class PlotWidget(pg.GraphicsWindow):
     def __init__(self):
@@ -36,7 +38,7 @@ class PlotWidget(pg.GraphicsWindow):
         self.setWindowTitle('pyqtgraph example: Scrolling Plots')
 
         p = self.addPlot()
-        self.data = np.zeros(300)
+        self.data = np.zeros(30)
         self.curve = p.plot(self.data, pen=pg.mkPen(QColor('#5961FF'), width=2))
         self.ptr = 0
 
@@ -66,19 +68,15 @@ class ExperimentData:
     def __init__(self):
         self.a_ch0 = []
         self.a_ch1 = []
-        self.a_ch20 = []
-        self.a_ch21 = []
         self.T_meas = []
 
-    def append(self, a_ch0, a_ch1, a_ch20, a_ch21, T_meas):
+    def append(self, a_ch0, a_ch1, T_meas):
         self.a_ch0 += a_ch0
         self.a_ch1 += a_ch1
-        self.a_ch20 += a_ch20
-        self.a_ch21 += a_ch21
         self.T_meas += T_meas
 
 class MainWindow(QWidget):
-    processData = pyqtSignal(list, list, list, list, list)
+    processData = pyqtSignal(list, list, int)
     def __init__(self):
         super(self.__class__, self).__init__(None)
 
@@ -94,11 +92,12 @@ class MainWindow(QWidget):
         self.rightLayout.addWidget(self.plotWidget)
 
         self.reader.timeUpdate.connect(self.onTimeUpdate)
+        self.reader.dataReady.connect(self.onDataReady)
 
-    @QtCore.pyqtSlot(list, list, list, list, list)
-    def onDataReady(self, a_ch0, a_ch1, a_ch20, a_ch21, T_meas):
-        self.experimentData.append(a_ch0, a_ch1, a_ch20, a_ch21, T_meas)
-        self.processData.emit(a_ch0, a_ch1, a_ch20, a_ch21, T_meas)
+    @QtCore.pyqtSlot(list, list, list)
+    def onDataReady(self, a_ch0, a_ch1, T_meas):
+        self.experimentData.append(a_ch0, a_ch1, T_meas)
+        self.processData.emit(a_ch0, a_ch1, self.interval_time)
 
     @QtCore.pyqtSlot(int)
     def onTimeUpdate(self, time):
@@ -111,7 +110,7 @@ class MainWindow(QWidget):
         self.rascanWorker.moveToThread(self.workerThread)
         self.workerThread.start()
 
-        self.reader.dataReady.connect(self.rascanWorker.doWork)
+        self.processData.connect(self.rascanWorker.doWork)
         self.rascanWorker.dataProcessed.connect(self.onRascanDataProcessed)
 
     def initGUI(self):
@@ -159,6 +158,9 @@ class MainWindow(QWidget):
         # back to main layout
         soundCheckBox = QCheckBox('Звуковое оповещение')
         leftLayout.addWidget(soundCheckBox)
+
+        saveCheckBox = QCheckBox('Автоматическое сохранение')
+        leftLayout.addWidget(saveCheckBox)
 
         self.timeLabel = QLabel('00:00:00')
         self.timeLabel.setObjectName('timeLabel')
@@ -217,8 +219,8 @@ class MainWindow(QWidget):
     def onButtonClick(self, toggled):
         if toggled:
             self.startStopButton.setText('СТОП')
-            interval_time = int(self.intervalLayoutEdit.text())
-            self.reader.startListen(interval_time)
+            self.interval_time = int(self.intervalLayoutEdit.text())
+            self.reader.startListen(self.interval_time)
         else:
             self.startStopButton.setText('ЗАПУСК')
             self.reader.stopListen()
@@ -227,7 +229,7 @@ class MainWindow(QWidget):
     def onSaveButtonClicked(self):
         QFileDialog.getSaveFileName()
 
-    @QtCore.pyqtSlot(int, int)
+    @QtCore.pyqtSlot(float, float)
     def onRascanDataProcessed(self, chss, chd):
         self.heartRateText.setText(str(chss))
         self.breathRateText.setText(str(chd))
