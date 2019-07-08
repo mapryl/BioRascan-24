@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (QApplication, QLabel, QWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QLineEdit,
-    QCheckBox, QFileDialog, QSpacerItem, QMessageBox)
+    QCheckBox, QFileDialog, QSpacerItem, QMessageBox, QComboBox)
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtMultimedia import QSoundEffect
@@ -11,6 +11,7 @@ import pyqtgraph as pg
 import numpy as np
 
 from BreathingRateCounter import breath_rate_counter
+from COMReader import serial_ports
 from pip._internal import exceptions
 
 class RascanWorker(QObject):
@@ -29,7 +30,10 @@ class RascanWorker(QObject):
         a_ch0 = a_ch0 / 8000
         a_ch1 = a_ch1 / 8000
 
-        hr, br = breath_rate_counter(a_ch0, a_ch1, t_interval)
+        try:
+            hr, br = breath_rate_counter(a_ch0, a_ch1, t_interval)
+        except:
+            hr, br = 0, 0
 
         self.dataProcessed.emit(hr, br)
 
@@ -101,6 +105,7 @@ class ExperimentData:
             fileName = QFileDialog.getSaveFileName(None, "Save unsaved data to file", QDir(".").canonicalPath(), "NPZ(*.npz)")
             np.savez_compressed(fileName[0], ch0=self.a_ch0, ch1=self.a_ch1,
                                 T=self.T_meas)
+            self.needToSave = False
 
 class MyIntValidator(QIntValidator):
     def __init__(self, min, max):
@@ -207,11 +212,22 @@ class MainWindow(QWidget):
         settingsLayout.addWidget(imin, 1, 2)
 
         # back to main layout
-        self.soundCheckBox = QCheckBox('Звуковое оповещение')
-        leftLayout.addWidget(self.soundCheckBox)
+        checkBoxLayout = QGridLayout()
+        leftLayout.addLayout(checkBoxLayout)
 
-        self.saveCheckBox = QCheckBox('Автоматическое сохранение')
-        leftLayout.addWidget(self.saveCheckBox)
+        self.soundCheckBox = QCheckBox('Звуковое оповещение')
+        checkBoxLayout.addWidget(self.soundCheckBox, 0, 0)
+
+        self.saveCheckBox = QCheckBox('Запрос на сохранение')
+        checkBoxLayout.addWidget(self.saveCheckBox, 1, 0)
+        self.saveCheckBox.toggle()
+
+        self.comBox = QComboBox(self)
+        COMLayoutText = QLabel('Выбор COM-порта')
+        COM_list = serial_ports()
+        self.comBox.addItems(COM_list)
+        checkBoxLayout.addWidget(COMLayoutText, 0, 1)
+        checkBoxLayout.addWidget(self.comBox, 1, 1)
 
         self.timeLabel = QLabel('00:00:00')
         self.timeLabel.setObjectName('timeLabel')
@@ -227,7 +243,7 @@ class MainWindow(QWidget):
         chss.setObjectName('leftBar')
         infoLayout.addWidget(chss)
 
-        self.heartRateText = QLabel('60')
+        self.heartRateText = QLabel('0')
         self.heartRateText.setObjectName('primary')
         self.heartRateText.setAlignment(Qt.AlignRight)
         infoLayout.addWidget(self.heartRateText)
@@ -242,7 +258,7 @@ class MainWindow(QWidget):
         chd.setObjectName('leftBar')
         infoLayout.addWidget(chd)
 
-        self.breathRateText = QLabel('21')
+        self.breathRateText = QLabel('0')
         self.breathRateText.setObjectName('primary')
         self.breathRateText.setAlignment(Qt.AlignRight)
         infoLayout.addWidget(self.breathRateText)
@@ -264,7 +280,7 @@ class MainWindow(QWidget):
         buttonLayout.addWidget(saveButton)
 
         self.startStopButton.toggled.connect(self.onButtonClick)
-        self.startStopButton.clicked.connect(self.writer.startSend)
+        #self.startStopButton.clicked.connect(self.writer.startSend)
 
     @QtCore.pyqtSlot(bool)
     def onButtonClick(self, toggled):
@@ -275,7 +291,8 @@ class MainWindow(QWidget):
             self.startStopButton.setText('СТОП')
             self.interval_time = int(self.intervalLayoutEdit.text())
             self.experimentLength = int(self.lengthSettingsEdit.text())
-            self.reader.startListen(self.interval_time)
+            portName = self.comBox.currentText()
+            self.reader.startListen(self.interval_time, portName)
             self.heartRatePlotWidget.reset()
             self.breathRatePlotWidget.reset()
         else:

@@ -4,7 +4,7 @@ import numpy as np
 from scipy.signal import butter, find_peaks
 
 """" Объявляем константы """
-fsB = 250  # частота дисретизации БРЛ
+fsB = 50  # частота дисретизации БРЛ
 lowcut_hb = 0.7
 highcut_hb = 2.5
 lowcut_br = 0.01

@@ -2,18 +2,23 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import *
 from PyQt5.QtSerialPort import *
 from struct import unpack
+import time
+
+# import serial
 
 # nice COM port emulator: https://www.virtual-serial-port.org/
 # QThread the right way http://qaru.site/questions/237794/example-of-the-right-way-to-use-qthread-in-pyqt
 
+
 class SerialPortReader(QtCore.QObject):
     dataReady = pyqtSignal(list, list, list)
     timeUpdate = pyqtSignal(int)
+
     def __init__(self):
         super(self.__class__, self).__init__(None)
 
         self.fullReset()
-        self.dt_ms = 4
+        self.dt_ms = 20
 
         self.port1 = QSerialPort()
         self.port2 = QSerialPort()
@@ -22,22 +27,22 @@ class SerialPortReader(QtCore.QObject):
         self.port2.readyRead.connect(self.OnPortRead)
 
     @QtCore.pyqtSlot(int)
-    def startListen(self, dataReadyInterval):
+    def startListen(self, dataReadyInterval, portName):
         self.fullReset()
         self.dataReadyInterval = dataReadyInterval * 1000
-        self.port1.setPortName('COM4')
-        self.port1.setBaudRate(QSerialPort.Baud38400)
-
-        self.port2.setPortName('COM5')
-        self.port2.setBaudRate(QSerialPort.Baud38400)
-
-        self.port1.open(QIODevice.ReadOnly)
-        self.port2.open(QIODevice.ReadOnly)
+        self.port1.setPortName(portName)
+        if self.port1.open(QIODevice.ReadWrite):
+            self.port1.setBaudRate(34800)
+            time.sleep(2)
+            self.port1.write(b'5')
+        else:
+            raise IOError("Cannot connect to device on port COM3")
 
     @QtCore.pyqtSlot()
     def stopListen(self):
+        self.port1.write(b'0')
         self.port1.close()
-        self.port2.close()
+        # self.port2.close()я
 
     @QtCore.pyqtSlot()
     def OnPortRead(self):
