@@ -61,7 +61,6 @@ QLineEdit {
 	border: none;
 	min-width: 125px;
 	max-width: 125px;
-	margin: 5px;
 	border-bottom : 2px solid #5961FF;
 }
 
@@ -82,4 +81,36 @@ QCheckBox::indicator:checked {
     width: 20px;
     height: 20px;
 	background-color: #5961FF;
+}
+
+QComboBox {
+    border: none;
+    background: #ffffff;
+    color: #5961FF;
+	border: 2px solid #5961FF;
+}
+
+QComboBox::down-arrow {
+    background: none;
+}
+
+QComboBox::drop-down {
+    border: none;
+}
+
+QComboBox QAbstractItemView {
+    border: 2px solid #5961FF;
+    border-top: none;
+    color: #333333;
+    background: #ffffff;
+    selection-background-color: #FF1776;
+    selection-color: #ffffff;
+    outline: none;
+}
+
+QPlainTextEdit {
+    margin-top: 20px;
+    color: #a0a0a0;
+    background: none;
+    border: none;
 }

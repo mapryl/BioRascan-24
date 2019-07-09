@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (QApplication, QLabel, QWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QLineEdit,
-    QCheckBox, QFileDialog, QSpacerItem, QMessageBox, QComboBox)
+    QCheckBox, QFileDialog, QSpacerItem, QMessageBox, QComboBox, QPlainTextEdit)
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtMultimedia import QSoundEffect
@@ -143,6 +143,8 @@ class MainWindow(QWidget):
         self.reader.timeUpdate.connect(self.onTimeUpdate)
         self.reader.dataReady.connect(self.onDataReady)
 
+        self.loadSettings()
+
     @QtCore.pyqtSlot(list, list, list)
     def onDataReady(self, a_ch0, a_ch1, T_meas):
         if self.experimentLength < 5:
@@ -190,12 +192,21 @@ class MainWindow(QWidget):
         mainLayout.addLayout(leftLayout, 1, 1, Qt.AlignCenter)
 
         self.rightLayout = QVBoxLayout()
-        mainLayout.addLayout(self.rightLayout, 1, 2, Qt.AlignCenter)
+        mainLayout.addLayout(self.rightLayout, 1, 3, Qt.AlignCenter)
 
-        mainLayout.setRowStretch(0, 1)
-        mainLayout.setRowStretch(3, 1)
-        mainLayout.setColumnStretch(0, 1)
-        mainLayout.setColumnStretch(3, 1)
+        mainLayout.setRowStretch(0, 2)     # empty space above ui
+        mainLayout.setRowStretch(1, 1)     # ui
+        mainLayout.setRowStretch(2, 2)     # empty space below ui
+        mainLayout.setColumnStretch(0, 2)  # empty space to the right from ui
+        mainLayout.setColumnStretch(2, 1)  # empty space between left layout and right layout
+        mainLayout.setColumnStretch(4, 2)  # empty space to the left from ui
+
+        # console output
+        self.console = QPlainTextEdit(self)
+        self.console.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.console.setReadOnly(True)
+        self.console.appendPlainText('готов к работе')
+        mainLayout.addWidget(self.console, 2, 1, 1, 3)
 
         # settings layout
         settingsLayout = QGridLayout()
@@ -220,6 +231,13 @@ class MainWindow(QWidget):
         settingsLayout.addWidget(self.intervalLayoutEdit, 1, 1)
         settingsLayout.addWidget(imin, 1, 2)
 
+        self.comBox = QComboBox(self)
+        COMLayoutText = QLabel('Выбор COM-порта')
+        COM_list = serial_ports()
+        self.comBox.addItems(COM_list)
+        settingsLayout.addWidget(COMLayoutText, 2, 0)
+        settingsLayout.addWidget(self.comBox, 2, 1)
+
         # back to main layout
         checkBoxLayout = QGridLayout()
         leftLayout.addLayout(checkBoxLayout)
@@ -230,13 +248,6 @@ class MainWindow(QWidget):
         self.saveCheckBox = QCheckBox('Запрос на сохранение')
         checkBoxLayout.addWidget(self.saveCheckBox, 1, 0)
         self.saveCheckBox.toggle()
-
-        self.comBox = QComboBox(self)
-        COMLayoutText = QLabel('Выбор COM-порта')
-        COM_list = serial_ports()
-        self.comBox.addItems(COM_list)
-        checkBoxLayout.addWidget(COMLayoutText, 0, 1)
-        checkBoxLayout.addWidget(self.comBox, 1, 1)
 
         self.timeLabel = QLabel('00:00:00')
         self.timeLabel.setObjectName('timeLabel')
@@ -322,7 +333,28 @@ class MainWindow(QWidget):
     def closeEvent(self, event):
         if (self.saveCheckBox.isChecked()):
             self.experimentData.saveIfNeeded()
+
+        self.saveSettings()
         event.accept()
+
+    def saveSettings(self):
+        settings = QSettings("BioRascan-24.ini", QSettings.IniFormat);
+
+        if (self.isMaximized() == False):
+            settings.setValue("geometry", self.geometry())
+
+        settings.setValue("maximized", self.isMaximized())
+
+    def loadSettings(self):
+        settings = QSettings("BioRascan-24.ini", QSettings.IniFormat);
+
+        screenRect = QApplication.desktop().screenGeometry();
+        defaultWindowRect = QRect(screenRect.width()/8, screenRect.height()*1.5/8, screenRect.width()*6/8, screenRect.height()*5/8)
+
+        self.setGeometry(settings.value("geometry", defaultWindowRect))
+
+        if (settings.value("maximized", False) == "true"):
+            self.setWindowState(self.windowState() ^ Qt.WindowMaximized)
 
 
 app = QApplication([])
