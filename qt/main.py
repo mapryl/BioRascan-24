@@ -60,7 +60,7 @@ class PlotWidget(pg.GraphicsWindow):
         p.setYRange(0, maxY, padding = 0)
 
     def appendPoint(self, value):
-        if(len(self.data) < self.dataSize):
+        if len(self.data) < self.dataSize:
             self.data.append(value)
         else:
             self.data[:-1] = self.data[1:]
@@ -84,11 +84,17 @@ class ExperimentData:
     def __init__(self):
         self.reset()
 
-    def append(self, a_ch0, a_ch1, T_meas):
+    def appendData(self, a_ch0, a_ch1, T_meas):
         self.a_ch0 += a_ch0
         self.a_ch1 += a_ch1
         self.T_meas += T_meas
         self.needToSave = True
+
+    def appentDataToTxt(self, a_ch0, a_ch1, T_meas):
+        with open('text.txt', 'a') as file:
+            for i in range(0, len(a_ch0)):
+                file.write(str(a_ch0[i]) + ' ' + str(a_ch1[i]) + ' ' + str(T_meas[i]) + '\n')
+        self.needToSave = False
 
     def reset(self):
         self.a_ch0 = []
@@ -97,11 +103,11 @@ class ExperimentData:
         self.needToSave = False
 
     def saveIfNeeded(self):
-        if(self.needToSave):
+        if self.needToSave:
             self.saveToFile()
 
     def saveToFile(self):
-        if(len(self.T_meas) != 0):
+        if len(self.T_meas) != 0:
             fileName = QFileDialog.getSaveFileName(None, "Save unsaved data to file", QDir(".").canonicalPath(), "NPZ(*.npz)")
             np.savez_compressed(fileName[0], ch0=self.a_ch0, ch1=self.a_ch1,
                                 T=self.T_meas)
@@ -139,7 +145,10 @@ class MainWindow(QWidget):
 
     @QtCore.pyqtSlot(list, list, list)
     def onDataReady(self, a_ch0, a_ch1, T_meas):
-        self.experimentData.append(a_ch0, a_ch1, T_meas)
+        if self.experimentLength < 5:
+            self.experimentData.appendData(a_ch0, a_ch1, T_meas)
+        else:
+            self.experimentData.appentDataToTxt(a_ch0, a_ch1, T_meas)
         self.processData.emit(a_ch0, a_ch1, self.interval_time)
 
     @QtCore.pyqtSlot(int)
@@ -148,9 +157,9 @@ class MainWindow(QWidget):
         qtTime = QTime.fromMSecsSinceStartOfDay(time)
         self.timeLabel.setText(qtTime.toString())
 
-        if(time == 0):
+        if time == 0:
             self.startStopButton.toggle()
-            if(self.soundCheckBox.isChecked()):
+            if self.soundCheckBox.isChecked():
                 self.sound.play()
 
     def createWorkerThread(self):
@@ -285,7 +294,7 @@ class MainWindow(QWidget):
     @QtCore.pyqtSlot(bool)
     def onButtonClick(self, toggled):
         if toggled:
-            if(self.saveCheckBox.isChecked()):
+            if self.saveCheckBox.isChecked():
                 self.experimentData.saveIfNeeded()
             self.experimentData.reset()
             self.startStopButton.setText('СТОП')

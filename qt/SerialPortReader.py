@@ -46,10 +46,10 @@ class SerialPortReader(QtCore.QObject):
 
     @QtCore.pyqtSlot()
     def OnPortRead(self):
-        print(self.port1.bytesAvailable(), self.port2.bytesAvailable())
+        # print(self.port1.bytesAvailable(), self.port2.bytesAvailable())
         while self.port1.bytesAvailable() > 4:
-            a0_mV  = (unpack('<H' , self.port1.read(2))[0])  # ads voltage = 2 bytes
-            a1_mV  = (unpack('<H' , self.port1.read(2))[0])
+            a0_mV = (unpack('<H', self.port1.read(2))[0])  # ads voltage = 2 bytes
+            a1_mV = (unpack('<H', self.port1.read(2))[0])
 
             self.a_ch0.append(a0_mV)
             self.a_ch1.append(a1_mV)
@@ -57,14 +57,14 @@ class SerialPortReader(QtCore.QObject):
             self.T_ms += self.dt_ms;
             self.T_meas.append(self.T_ms)
 
-            if(self.T_ms % 1000 == 0):
+            if (self.T_ms % 1000 == 0):
                 self.timeUpdate.emit(self.T_ms)
 
-            if(self.T_ms % self.dataReadyInterval == 0):
+            if (self.T_ms % self.dataReadyInterval == 0):
                 self.dataReady.emit(self.a_ch0, self.a_ch1, self.T_meas)
                 self.reset()
 
-            print("recieved data:", a0_mV, a1_mV, self.T_ms/1000)
+            print("recieved data:", a0_mV, a1_mV, self.T_ms / 1000)
 
     def reset(self):
         self.a_ch0 = []
