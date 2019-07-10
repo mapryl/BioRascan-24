@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (QApplication, QLabel, QWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QLineEdit,
-    QCheckBox, QFileDialog, QSpacerItem, QMessageBox, QComboBox)
+    QCheckBox, QFileDialog, QSpacerItem, QMessageBox, QComboBox, QInputDialog, QPlainTextEdit)
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtMultimedia import QSoundEffect
@@ -7,8 +7,12 @@ from PyQt5.QtMultimedia import QSoundEffect
 from SerialPortReader import *
 from SerialPortWriter import *
 
+from OutLog import OutLog
+
 import pyqtgraph as pg
 import numpy as np
+
+import sys
 
 from BreathingRateCounter import breath_rate_counter
 from COMReader import serial_ports
@@ -45,7 +49,7 @@ class PlotWidget(pg.GraphicsWindow):
 
         p = self.addPlot()
         self.plot = p
-        self.dataSize = 10
+        self.dataSize = 30
         self.data = []
         self.curve = p.plot(self.data, pen=pg.mkPen(QColor('#5961FF'), width=2))
         self.ptr = 0
@@ -90,8 +94,8 @@ class ExperimentData:
         self.T_meas += T_meas
         self.needToSave = True
 
-    def appentDataToTxt(self, a_ch0, a_ch1, T_meas):
-        with open('text.txt', 'a') as file:
+    def appentDataToTxt(self, a_ch0, a_ch1, T_meas, fileName):
+        with open(str(fileName + '.txt'), 'a') as file:
             for i in range(0, len(a_ch0)):
                 file.write(str(a_ch0[i]) + ' ' + str(a_ch1[i]) + ' ' + str(T_meas[i]) + '\n')
         self.needToSave = False
@@ -104,10 +108,15 @@ class ExperimentData:
 
     def saveIfNeeded(self):
         if self.needToSave:
-            self.saveToFile()
+            answer = QMessageBox.question(None, "Сообщение",
+                                          "Имеются несохраненные данные, сохранить?",
+                                          QMessageBox.Yes, QMessageBox.No)
+            if answer == QMessageBox.Yes:
+                self.saveToFile()
 
     def saveToFile(self):
         if len(self.T_meas) != 0:
+
             fileName = QFileDialog.getSaveFileName(None, "Save unsaved data to file", QDir(".").canonicalPath(), "NPZ(*.npz)")
             np.savez_compressed(fileName[0], ch0=self.a_ch0, ch1=self.a_ch1,
                                 T=self.T_meas)
@@ -119,6 +128,7 @@ class MyIntValidator(QIntValidator):
         self.min = min
 
     def fixup(self, s):
+        print("Задано значение вне допустимого диапазона")
         return str(self.min)
 
 class MainWindow(QWidget):
@@ -131,25 +141,30 @@ class MainWindow(QWidget):
         self.experimentData = ExperimentData()
 
         self.initGUI()
+
+        sys.stdout = OutLog(self.console, sys.stdout)
+        sys.stderr = OutLog(self.console, sys.stderr, QColor(255, 0, 0))
+
         self.initSound()
 
         self.createWorkerThread()
 
-        self.heartRatePlotWidget = PlotWidget(70)
-        self.breathRatePlotWidget = PlotWidget(40)
+        self.heartRatePlotWidget = PlotWidget(150)
+        self.breathRatePlotWidget = PlotWidget(60)
         self.rightLayout.addWidget(self.heartRatePlotWidget)
         self.rightLayout.addWidget(self.breathRatePlotWidget)
 
         self.reader.timeUpdate.connect(self.onTimeUpdate)
         self.reader.dataReady.connect(self.onDataReady)
+        self.loadSettings()
 
     @QtCore.pyqtSlot(list, list, list)
     def onDataReady(self, a_ch0, a_ch1, T_meas):
         if self.experimentLength < 5:
             self.experimentData.appendData(a_ch0, a_ch1, T_meas)
         else:
-            self.experimentData.appentDataToTxt(a_ch0, a_ch1, T_meas)
-        self.processData.emit(a_ch0, a_ch1, self.interval_time)
+            self.experimentData.appentDataToTxt(a_ch0, a_ch1, T_meas, self.txtFileName)
+        self.processData.emit(a_ch0, a_ch1, self.intervalLength)
 
     @QtCore.pyqtSlot(int)
     def onTimeUpdate(self, time):
@@ -181,6 +196,7 @@ class MainWindow(QWidget):
 
     def initGUI(self):
         self.setWindowTitle('БиоРАСКАН-24')
+        self.setWindowIcon(QIcon('Рисунок1.png'))
 
         mainLayout = QGridLayout()
         self.setLayout(mainLayout)
@@ -188,14 +204,23 @@ class MainWindow(QWidget):
         leftLayout = QVBoxLayout()
         leftLayout.setSpacing(20)
         mainLayout.addLayout(leftLayout, 1, 1, Qt.AlignCenter)
-
         self.rightLayout = QVBoxLayout()
-        mainLayout.addLayout(self.rightLayout, 1, 2, Qt.AlignCenter)
 
-        mainLayout.setRowStretch(0, 1)
-        mainLayout.setRowStretch(3, 1)
-        mainLayout.setColumnStretch(0, 1)
-        mainLayout.setColumnStretch(3, 1)
+        mainLayout.addLayout(self.rightLayout, 1, 3, Qt.AlignCenter)
+
+        mainLayout.setRowStretch(0, 2)     # empty space above ui
+        mainLayout.setRowStretch(1, 1)     # ui
+        mainLayout.setRowStretch(2, 2)     # empty space below ui
+        mainLayout.setColumnStretch(0, 2)  # empty space to the right from ui
+        mainLayout.setColumnStretch(2, 1)  # empty space between left layout and right layout
+        mainLayout.setColumnStretch(4, 2)  # empty space to the left from ui
+
+        # console output
+        self.console = QPlainTextEdit(self)
+        self.console.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.console.setReadOnly(True)
+        self.console.appendPlainText('')
+        mainLayout.addWidget(self.console, 2, 1, 1, 3)
 
         # settings layout
         settingsLayout = QGridLayout()
@@ -213,12 +238,19 @@ class MainWindow(QWidget):
 
         intervalLayoutText = QLabel('Интервал расчета')
         self.intervalLayoutEdit = QLineEdit('10')
-        self.intervalLayoutEdit.setValidator(MyIntValidator(10, 60))
+        self.intervalLayoutEdit.setValidator(MyIntValidator(10, 300))
         imin = QLabel('сек')
         imin.setObjectName("secondary")
         settingsLayout.addWidget(intervalLayoutText, 1, 0)
         settingsLayout.addWidget(self.intervalLayoutEdit, 1, 1)
         settingsLayout.addWidget(imin, 1, 2)
+
+        self.comBox = QComboBox(self)
+        COMLayoutText = QLabel('Выбор COM-порта')
+        COM_list = serial_ports()
+        self.comBox.addItems(COM_list)
+        settingsLayout.addWidget(COMLayoutText, 2, 0)
+        settingsLayout.addWidget(self.comBox, 2, 1)
 
         # back to main layout
         checkBoxLayout = QGridLayout()
@@ -230,13 +262,6 @@ class MainWindow(QWidget):
         self.saveCheckBox = QCheckBox('Запрос на сохранение')
         checkBoxLayout.addWidget(self.saveCheckBox, 1, 0)
         self.saveCheckBox.toggle()
-
-        self.comBox = QComboBox(self)
-        COMLayoutText = QLabel('Выбор COM-порта')
-        COM_list = serial_ports()
-        self.comBox.addItems(COM_list)
-        checkBoxLayout.addWidget(COMLayoutText, 0, 1)
-        checkBoxLayout.addWidget(self.comBox, 1, 1)
 
         self.timeLabel = QLabel('00:00:00')
         self.timeLabel.setObjectName('timeLabel')
@@ -294,14 +319,43 @@ class MainWindow(QWidget):
     @QtCore.pyqtSlot(bool)
     def onButtonClick(self, toggled):
         if toggled:
+            portName = self.comBox.currentText()
+            if portName == '':
+                print("Устройство не подключено")
+                self.startStopButton.blockSignals(True)
+                self.startStopButton.setChecked(False)
+                self.startStopButton.blockSignals(False)
+                return
             if self.saveCheckBox.isChecked():
                 self.experimentData.saveIfNeeded()
             self.experimentData.reset()
             self.startStopButton.setText('СТОП')
-            self.interval_time = int(self.intervalLayoutEdit.text())
+            self.intervalLength = int(self.intervalLayoutEdit.text())
             self.experimentLength = int(self.lengthSettingsEdit.text())
-            portName = self.comBox.currentText()
-            self.reader.startListen(self.interval_time, portName)
+            if self.experimentLength >= 5:
+                txtFileName, ok = QInputDialog.getText(self, 'Ввод имени файла',
+                                                       'Длительность эксперимента более 5 минут\n\n'
+                                                       'Будет произведено сохранение в текстовый файл\n\n'
+                                                       'Введите имя .txt файла без расширения')
+                if ok:
+                    self.txtFileName = str(txtFileName)
+                    try:
+                        open(txtFileName + '.txt', 'w').close()
+                    except OSError:
+                        print("Неправильное имя файла")
+                        self.startStopButton.setChecked(False)
+                        self.startStopButton.setText('ЗАПУСК')
+                        return
+                else:
+                    self.startStopButton.setChecked(False)
+                    self.startStopButton.setText('ЗАПУСК')
+                    return
+
+            print("Подождите, программа запускается...")
+            if self.experimentLength < self.intervalLength / 60:
+                print("Интервал расчета больше длительности эксперимента.\n"
+                      "Расчет ЧСС и ЧД не производится. Осуществляется запись в файл.")
+            self.reader.startListen(self.intervalLength, portName)
             self.heartRatePlotWidget.reset()
             self.breathRatePlotWidget.reset()
         else:
@@ -322,7 +376,28 @@ class MainWindow(QWidget):
     def closeEvent(self, event):
         if (self.saveCheckBox.isChecked()):
             self.experimentData.saveIfNeeded()
+        self.saveSettings()
         event.accept()
+
+    def saveSettings(self):
+        settings = QSettings("BioRascan-24.ini", QSettings.IniFormat);
+
+        if (self.isMaximized() == False):
+            settings.setValue("geometry", self.geometry())
+
+        settings.setValue("maximized", self.isMaximized())
+
+    def loadSettings(self):
+        settings = QSettings("BioRascan-24.ini", QSettings.IniFormat);
+
+        screenRect = QApplication.desktop().screenGeometry();
+        defaultWindowRect = QRect(screenRect.width() / 8, screenRect.height() * 1.5 / 8, screenRect.width() * 6 / 8,
+                                  screenRect.height() * 5 / 8)
+
+        self.setGeometry(settings.value("geometry", defaultWindowRect))
+
+        if (settings.value("maximized", False) == "true"):
+            self.setWindowState(self.windowState() ^ Qt.WindowMaximized)
 
 
 app = QApplication([])
