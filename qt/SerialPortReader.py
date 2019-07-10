@@ -17,6 +17,9 @@ class SerialPortReader(QtCore.QObject):
     def __init__(self):
         super(self.__class__, self).__init__(None)
 
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.continueListen)
+
         self.fullReset()
         self.dt_ms = 20
 
@@ -33,16 +36,23 @@ class SerialPortReader(QtCore.QObject):
         self.port1.setPortName(portName)
         if self.port1.open(QIODevice.ReadWrite):
             self.port1.setBaudRate(34800)
-            time.sleep(2)
-            self.port1.write(b'5')
+            self.timer.setInterval(2000)
+            self.timer.setSingleShot(True)
+            self.timer.start()
         else:
-            raise IOError("Cannot connect to device on port COM3")
+            raise IOError("Cannot connect to device on com port")
+
+    @QtCore.pyqtSlot()
+    def continueListen(self):
+        self.port1.write(b'5')
+        print("Регистрация начата")
 
     @QtCore.pyqtSlot()
     def stopListen(self):
+        self.timer.stop()
         self.port1.write(b'0')
         self.port1.close()
-        # self.port2.close()я
+        print("Регистрация окончена")
 
     @QtCore.pyqtSlot()
     def OnPortRead(self):
@@ -57,14 +67,12 @@ class SerialPortReader(QtCore.QObject):
             self.T_ms += self.dt_ms;
             self.T_meas.append(self.T_ms)
 
-            if (self.T_ms % 1000 == 0):
-                self.timeUpdate.emit(self.T_ms)
-
-            if (self.T_ms % self.dataReadyInterval == 0):
+            if self.T_ms % self.dataReadyInterval == 0:
                 self.dataReady.emit(self.a_ch0, self.a_ch1, self.T_meas)
                 self.reset()
 
-            print("recieved data:", a0_mV, a1_mV, self.T_ms / 1000)
+            if self.T_ms % 1000 == 0:
+                self.timeUpdate.emit(self.T_ms)
 
     def reset(self):
         self.a_ch0 = []
