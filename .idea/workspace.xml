@@ -2,13 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="79a54b99-4d37-4538-812d-d3260d89915d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qt/COMReader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/BioRascan-24_last.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BioRascan-24_last.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qt/.npz" beforeDir="false" afterPath="$PROJECT_DIR$/qt/.npz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qt/BreathingRateCounter.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/BreathingRateCounter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qt/SerialPortReader.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/SerialPortReader.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/qt/ConsoleWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qt/BioRascan-24.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qt/OutLog.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/OutLog.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qt/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -36,10 +34,34 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/qt/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="792">
-              <caret line="216" lean-forward="true" selection-start-line="216" selection-end-line="216" />
+            <state relative-caret-position="294">
+              <caret line="410" column="47" lean-forward="true" selection-start-line="410" selection-start-column="47" selection-end-line="410" selection-end-column="47" />
               <folding>
-                <element signature="e#0#195#0" expanded="true" />
+                <element signature="e#0#225#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/qt/ConsoleWidget.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="400">
+              <caret line="16" column="34" lean-forward="true" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
+              <folding>
+                <element signature="e#0#42#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/qt/OutLog.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="225">
+              <caret line="9" column="44" selection-start-line="9" selection-start-column="44" selection-end-line="9" selection-end-column="44" />
+              <folding>
+                <element signature="e#0#25#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -48,26 +70,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/qt/BreathingRateCounter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="66">
-              <caret line="6" column="8" selection-start-line="6" selection-start-column="8" selection-end-line="6" selection-end-column="8" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/site-packages/numpy/fft/fftpack.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="163">
-              <caret line="59" selection-start-line="59" selection-end-line="59" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/site-packages/numpy/core/numeric.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="104">
-              <caret line="537" selection-start-line="537" selection-end-line="537" />
+            <state relative-caret-position="75">
+              <caret line="6" column="7" selection-start-line="6" selection-start-column="7" selection-end-line="6" selection-end-column="7" />
             </state>
           </provider>
         </entry>
@@ -75,11 +79,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/qt/COMReader.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
-              <folding>
-                <element signature="e#0#10#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="50">
+              <caret line="2" selection-start-line="2" selection-end-line="2" />
             </state>
           </provider>
         </entry>
@@ -87,8 +88,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/qt/SerialPortReader.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="110">
-              <caret line="20" column="23" selection-start-line="20" selection-start-column="23" selection-end-line="20" selection-end-column="23" />
+            <state relative-caret-position="700">
+              <caret line="32" column="8" selection-start-line="32" selection-start-column="8" selection-end-line="32" selection-end-column="8" />
               <folding>
                 <element signature="e#0#24#0" expanded="true" />
               </folding>
@@ -115,6 +116,10 @@
       <find>serial</find>
       <find>start</find>
       <find>sta</find>
+      <find>intervalLayoutEdit</find>
+      <find>soundCheckBox</find>
+      <find>OutLog</find>
+      <find>Ras</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -126,13 +131,17 @@
         <option value="$PROJECT_DIR$/qt/COMReader.py" />
         <option value="$PROJECT_DIR$/qt/SerialPortReader.py" />
         <option value="$PROJECT_DIR$/qt/BreathingRateCounter.py" />
+        <option value="$PROJECT_DIR$/qt/fonts/ConsoleWidget.py" />
+        <option value="$PROJECT_DIR$/qt/stylesheet.qss" />
+        <option value="$PROJECT_DIR$/qt/ConsoleWidget.py" />
+        <option value="$PROJECT_DIR$/qt/OutLog.py" />
         <option value="$PROJECT_DIR$/qt/main.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="84" />
-    <option name="y" value="24" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="219" />
+    <option name="y" value="206" />
     <option name="width" value="1752" />
     <option name="height" value="981" />
   </component>
@@ -141,23 +150,23 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="Bio_Rascan24" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Bio_Rascan24" type="462c0819:PsiDirectoryNode" />
+              <item name="BioRascan-24_last" type="b2602c69:ProjectViewProjectNode" />
+              <item name="BioRascan-24_last" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="Bio_Rascan24" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Bio_Rascan24" type="462c0819:PsiDirectoryNode" />
+              <item name="BioRascan-24_last" type="b2602c69:ProjectViewProjectNode" />
+              <item name="BioRascan-24_last" type="462c0819:PsiDirectoryNode" />
               <item name="qt" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -208,9 +217,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="C:\Users\terenty\PycharmProjects\BioRascan-24\venv\Scripts\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/qt" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -243,15 +252,16 @@
     <option name="totallyTimeSpent" value="13234000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2271625" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23308668" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32978722" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39893618" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32907662" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.3988212" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -310,32 +320,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/qt/COMReader.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="50">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/site-packages/numpy/core/numeric.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="104">
-          <caret line="537" selection-start-line="537" selection-end-line="537" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/site-packages/numpy/fft/fftpack.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="163">
-          <caret line="59" selection-start-line="59" selection-end-line="59" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/site-packages/numpy/core/numeric.py" />
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/site-packages/numpy/fft/fftpack.py" />
     <entry file="file://$PROJECT_DIR$/qt/SerialPortReader.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="110">
-          <caret line="20" column="23" selection-start-line="20" selection-start-column="23" selection-end-line="20" selection-end-column="23" />
+        <state relative-caret-position="700">
+          <caret line="32" column="8" selection-start-line="32" selection-start-column="8" selection-end-line="32" selection-end-column="8" />
           <folding>
             <element signature="e#0#24#0" expanded="true" />
           </folding>
@@ -344,17 +339,50 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/qt/BreathingRateCounter.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="66">
-          <caret line="6" column="8" selection-start-line="6" selection-start-column="8" selection-end-line="6" selection-end-column="8" />
+        <state relative-caret-position="75">
+          <caret line="6" column="7" selection-start-line="6" selection-start-column="7" selection-end-line="6" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/qt/fonts/ConsoleWidget.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/qt/stylesheet.qss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="471">
+          <caret line="114" column="17" selection-start-line="114" selection-start-column="17" selection-end-line="114" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/qt/BioRascan-24.ini">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/qt/OutLog.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="9" column="44" selection-start-line="9" selection-start-column="44" selection-end-line="9" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/qt/ConsoleWidget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="16" column="34" lean-forward="true" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
+          <folding>
+            <element signature="e#0#42#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/qt/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="792">
-          <caret line="216" lean-forward="true" selection-start-line="216" selection-end-line="216" />
+        <state relative-caret-position="294">
+          <caret line="410" column="47" lean-forward="true" selection-start-line="410" selection-start-column="47" selection-end-line="410" selection-end-column="47" />
           <folding>
-            <element signature="e#0#195#0" expanded="true" />
+            <element signature="e#0#225#0" expanded="true" />
           </folding>
         </state>
       </provider>

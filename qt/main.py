@@ -6,6 +6,7 @@ from PyQt5.QtMultimedia import QSoundEffect
 
 from SerialPortReader import *
 from SerialPortWriter import *
+from ConsoleWidget import ConsoleWidget
 
 from OutLog import OutLog
 
@@ -19,7 +20,6 @@ from COMReader import serial_ports
 from pip._internal import exceptions
 
 class RascanWorker(QObject):
-
     dataProcessed = pyqtSignal(float, float)
 
     def __init__(self, parent=None):
@@ -41,11 +41,12 @@ class RascanWorker(QObject):
 
         self.dataProcessed.emit(hr, br)
 
+
 class PlotWidget(pg.GraphicsWindow):
     def __init__(self, maxY):
         super(self.__class__, self).__init__(None)
 
-        self.setWindowTitle('pyqtgraph example: Scrolling Plots')
+        self.setWindowTitle('BioRascan-24 plot')
 
         p = self.addPlot()
         self.plot = p
@@ -210,16 +211,16 @@ class MainWindow(QWidget):
 
         mainLayout.setRowStretch(0, 2)     # empty space above ui
         mainLayout.setRowStretch(1, 1)     # ui
-        mainLayout.setRowStretch(2, 2)     # empty space below ui
+        mainLayout.setRowStretch(2, 2)     # console
+        mainLayout.setRowStretch(3, 2)     # empty space below ui
         mainLayout.setColumnStretch(0, 2)  # empty space to the right from ui
         mainLayout.setColumnStretch(2, 1)  # empty space between left layout and right layout
         mainLayout.setColumnStretch(4, 2)  # empty space to the left from ui
 
         # console output
-        self.console = QPlainTextEdit(self)
+        self.console = ConsoleWidget(self)
         self.console.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.console.setReadOnly(True)
-        self.console.appendPlainText('')
         mainLayout.addWidget(self.console, 2, 1, 1, 3)
 
         # settings layout
@@ -261,7 +262,6 @@ class MainWindow(QWidget):
 
         self.saveCheckBox = QCheckBox('Запрос на сохранение')
         checkBoxLayout.addWidget(self.saveCheckBox, 1, 0)
-        self.saveCheckBox.toggle()
 
         self.timeLabel = QLabel('00:00:00')
         self.timeLabel.setObjectName('timeLabel')
@@ -386,6 +386,11 @@ class MainWindow(QWidget):
             settings.setValue("geometry", self.geometry())
 
         settings.setValue("maximized", self.isMaximized())
+        settings.setValue("length", self.lengthSettingsEdit.text())
+        settings.setValue("interval", self.intervalLayoutEdit.text())
+        settings.setValue("sound", self.soundCheckBox.isChecked())
+        settings.setValue("save", self.saveCheckBox.isChecked())
+        settings.setValue("port", self.comBox.currentText())
 
     def loadSettings(self):
         settings = QSettings("BioRascan-24.ini", QSettings.IniFormat);
@@ -399,6 +404,19 @@ class MainWindow(QWidget):
         if (settings.value("maximized", False) == "true"):
             self.setWindowState(self.windowState() ^ Qt.WindowMaximized)
 
+        self.lengthSettingsEdit.setText(settings.value("length", "1"))
+        self.intervalLayoutEdit.setText(settings.value("interval", "10"))
+
+        if (settings.value("sound", False) == "true"):
+            self.soundCheckBox.setChecked(True)
+
+        if (settings.value("save", True) == "true"):
+            self.saveCheckBox.setChecked(True)
+
+        portName = settings.value("port", "")
+        itemIndex = self.comBox.findText(portName)
+        if (itemIndex != -1):
+            self.comBox.setCurrentIndex(itemIndex)
 
 app = QApplication([])
 

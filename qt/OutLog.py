@@ -1,27 +1,26 @@
 from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
-class OutLog:
+class OutLog(QObject):
+    printSignal = pyqtSignal(str, 'QColor')
+
     def __init__(self, edit, out=None, color=None):
-        """(edit, out=None, color=None) -> can write stdout, stderr to a
-        QTextEdit.
-        edit = QTextEdit
-        out = alternate stream ( can be the original sys.stdout )
-        color = alternate color (i.e. color stderr a different color)
-        """
+        super(self.__class__, self).__init__(None)
+
+        self.printSignal.connect(edit.printMessage)
+
         self.edit = edit
-        self.out = None
+        self.old_out = out
         self.color = color
 
-    def write(self, m):
-        if self.color:
-            tc = self.edit.textColor()
-            self.edit.setTextColor(self.color)
+        if not self.color:
+            self.color = QColor('#a0a0a0') # default color
 
-        self.edit.moveCursor(QTextCursor.End)
-        self.edit.insertPlainText( m )
+    def write(self, msg):
+         self.printSignal.emit(msg, self.color)
 
-        if self.color:
-            self.edit.setTextColor(tc)
+         if self.old_out:
+             self.old_out.write(msg)
 
-        if self.out:
-            self.out.write(m)
+    def flush(self):
+        pass
