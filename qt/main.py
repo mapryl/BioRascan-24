@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import (QApplication, QLabel, QWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QLineEdit,
-    QCheckBox, QFileDialog, QSpacerItem, QMessageBox, QComboBox, QInputDialog, QPlainTextEdit)
+from PyQt5.QtWidgets import (QApplication, QLabel, QWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QLabel,
+                             QLineEdit, QCheckBox, QFileDialog, QSpacerItem, QMessageBox, QComboBox, QInputDialog,
+                             QPlainTextEdit)
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtMultimedia import QSoundEffect
@@ -19,6 +20,7 @@ from BreathingRateCounter import breath_rate_counter
 from COMReader import serial_ports
 from pip._internal import exceptions
 
+
 class RascanWorker(QObject):
     dataProcessed = pyqtSignal(float, float)
 
@@ -35,7 +37,7 @@ class RascanWorker(QObject):
         a_ch1 = a_ch1 / 8000
 
         try:
-            hr, br = breath_rate_counter(a_ch0, a_ch1, t_interval)
+            hr, br = breath_rate_counter(a_ch0, a_ch1, t_interval, lowFreqHearth, highFreqHearth, lowFreqBreath, highFreqBreath)
         except:
             hr, br = 0, 0
 

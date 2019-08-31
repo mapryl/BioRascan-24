@@ -88,10 +88,19 @@ def heart_filter(signal_r1_1, signal_r1_2):
     return signalfilt_hb_r1_1, signalfilt_hb_r1_2, signalfilt_hb_r1_1_w, signalfilt_hb_r1_2_w
 
 
-def breath_rate_counter(signal_r1_1, signal_r1_2, time):
+def breath_rate_counter(signal_r1_1, signal_r1_2, time, lowFreqHearth, highFreqHearth, lowFreqBreath, highFreqBreath):
     """
     Предварительная обработка данных
     """
+    global lowFreqHearthGlobal
+    global highFreqHearthGlobal
+    global lowFreqBreathGlobal
+    global highFreqBreathGlobal
+    lowFreqHearthGlobal = lowFreqHearth
+    highFreqHearthGlobal = highFreqHearth
+    lowFreqBreathGlobal = lowFreqBreath
+    highFreqBreathGlobal = highFreqBreath
+
     signal_r1_1 = signal.detrend(signal_r1_1)  # удаляем тренд средней линии
     signal_r1_2 = signal.detrend(signal_r1_2)
     signalfilt_br_r1_1, signalfilt_br_r1_2 = breath_filter(signal_r1_1, signal_r1_2)
