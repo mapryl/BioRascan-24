@@ -8,7 +8,7 @@ from PyQt5.QtMultimedia import QSoundEffect
 from SerialPortReader import *
 from SerialPortWriter import *
 from ConsoleWidget import ConsoleWidget
-
+from SettingsWidget import SettingsWidget
 from OutLog import OutLog
 
 import pyqtgraph as pg
@@ -19,7 +19,6 @@ import sys
 from BreathingRateCounter import breath_rate_counter
 from COMReader import serial_ports
 from pip._internal import exceptions
-
 
 class RascanWorker(QObject):
     dataProcessed = pyqtSignal(float, float)
@@ -201,6 +200,8 @@ class MainWindow(QWidget):
         self.setWindowTitle('БиоРАСКАН-24')
         self.setWindowIcon(QIcon('Рисунок1.png'))
 
+        self.settingsWidget = SettingsWidget(self)
+
         mainLayout = QGridLayout()
         self.setLayout(mainLayout)
 
@@ -236,8 +237,10 @@ class MainWindow(QWidget):
         lmin.setObjectName("secondary")
 
         settingsLayout.addWidget(lengthSettingsText, 0, 0)
-        settingsLayout.addWidget(self.lengthSettingsEdit, 0, 1)
-        settingsLayout.addWidget(lmin, 0, 2)
+        settingsLayout.addWidget(self.lengthSettingsEdit, 0, 2)
+        settingsLayout.addWidget(lmin, 0, 3)
+
+        settingsLayout.setColumnMinimumWidth(1, 30) # middle column to add some sapace
 
         intervalLayoutText = QLabel('Интервал расчета')
         self.intervalLayoutEdit = QLineEdit('10')
@@ -245,25 +248,30 @@ class MainWindow(QWidget):
         imin = QLabel('сек')
         imin.setObjectName("secondary")
         settingsLayout.addWidget(intervalLayoutText, 1, 0)
-        settingsLayout.addWidget(self.intervalLayoutEdit, 1, 1)
-        settingsLayout.addWidget(imin, 1, 2)
+        settingsLayout.addWidget(self.intervalLayoutEdit, 1, 2)
+        settingsLayout.addWidget(imin, 1, 3)
 
         self.comBox = QComboBox(self)
         COMLayoutText = QLabel('Выбор COM-порта')
         COM_list = serial_ports()
         self.comBox.addItems(COM_list)
         settingsLayout.addWidget(COMLayoutText, 2, 0)
-        settingsLayout.addWidget(self.comBox, 2, 1)
+        settingsLayout.addWidget(self.comBox, 2, 2)
 
         # back to main layout
-        checkBoxLayout = QGridLayout()
-        leftLayout.addLayout(checkBoxLayout)
+
+        settingsLayout.setRowMinimumHeight(3, 20) # add some space vertically
 
         self.soundCheckBox = QCheckBox('Звуковое оповещение')
-        checkBoxLayout.addWidget(self.soundCheckBox, 0, 0)
+        settingsLayout.addWidget(self.soundCheckBox, 4, 0)
 
         self.saveCheckBox = QCheckBox('Запрос на сохранение')
-        checkBoxLayout.addWidget(self.saveCheckBox, 1, 0)
+        settingsLayout.addWidget(self.saveCheckBox, 5, 0)
+
+        self.settingsButton = QPushButton('ДОПОЛНИТЕЛЬНО')
+        self.settingsButton.setObjectName('secondary')
+        settingsLayout.addWidget(self.settingsButton, 4, 2, 2, 2, Qt.AlignLeft)
+        self.settingsButton.clicked.connect(lambda : self.settingsWidget.open())
 
         self.timeLabel = QLabel('00:00:00')
         self.timeLabel.setObjectName('timeLabel')
