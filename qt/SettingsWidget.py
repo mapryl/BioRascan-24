@@ -27,10 +27,10 @@ class SettingsWidget(QDialog):
         mainLayout.setColumnStretch(1, 0)      # ui
         mainLayout.setColumnStretch(2, 1)      # empty space to the left from ui
 
-        self.lhf = 1;
-        self.hhf = 2;
-        self.lbf = 0.1;
-        self.hbf = 1;
+        self.lhf = 0.7
+        self.hhf = 2.5
+        self.lbf = 0.01
+        self.hbf = 0.4
 
         lowHeartFreqLabel = QLabel("Нижняя частота сердечных сокращений")
         self.lowHeartFreqEdit = QLineEdit()
@@ -39,7 +39,6 @@ class SettingsWidget(QDialog):
         self.settingsLayout.addWidget(lowHeartFreqLabel, 0, 0)
         self.settingsLayout.addWidget(self.lowHeartFreqEdit, 0, 1)
         self.settingsLayout.addWidget(unitsLabel1, 0, 2)
-        self.lowHeartFreqEdit.setText(str(self.lhf))
 
         highHeartFreqLabel = QLabel("Верхняя частота сердечных сокращений")
         self.highHeartFreqEdit = QLineEdit()
@@ -48,7 +47,6 @@ class SettingsWidget(QDialog):
         self.settingsLayout.addWidget(highHeartFreqLabel, 1, 0)
         self.settingsLayout.addWidget(self.highHeartFreqEdit, 1, 1)
         self.settingsLayout.addWidget(unitsLabel2, 1, 2)
-        self.highHeartFreqEdit.setText(str(self.hhf))
 
         lowBreathFreqLabel = QLabel("Нижняя частота дыхания")
         self.lowBreathFreqEdit = QLineEdit()
@@ -57,7 +55,6 @@ class SettingsWidget(QDialog):
         self.settingsLayout.addWidget(lowBreathFreqLabel, 2, 0)
         self.settingsLayout.addWidget(self.lowBreathFreqEdit, 2, 1)
         self.settingsLayout.addWidget(unitsLabel3, 2, 2)
-        self.lowBreathFreqEdit.setText(str(self.lbf))
 
         highBreathFreqLabel = QLabel("Верхняя частота дыхания")
         self.highBreathFreqEdit = QLineEdit()
@@ -66,7 +63,6 @@ class SettingsWidget(QDialog):
         self.settingsLayout.addWidget(highBreathFreqLabel, 3, 0)
         self.settingsLayout.addWidget(self.highBreathFreqEdit, 3, 1)
         self.settingsLayout.addWidget(unitsLabel4, 3, 2)
-        self.highBreathFreqEdit.setText(str(self.hbf))
 
         buttonsLayout = QHBoxLayout()
 
@@ -82,8 +78,29 @@ class SettingsWidget(QDialog):
 
         self.settingsLayout.addLayout(buttonsLayout, 5, 0, 1, 3)
 
+    def setValues(self, lhf, hhf, lbf, hbf):
+        self.lhf = lhf
+        self.hhf = hhf
+        self.lbf = lbf
+        self.hbf = hbf
+
+    def getValues(self):
+        return self.lhf, self.hhf, self.lbf, self.hbf
+
+    def showEvent(self, event):
+        self.lowHeartFreqEdit.setText(str(self.lhf))
+        self.highHeartFreqEdit.setText(str(self.hhf))
+        self.lowBreathFreqEdit.setText(str(self.lbf))
+        self.highBreathFreqEdit.setText(str(self.hbf))
+
     @pyqtSlot()
     def onOk(self):
+        self.setValues(
+            float(self.lowHeartFreqEdit.text()),
+            float(self.highHeartFreqEdit.text()),
+            float(self.lowBreathFreqEdit.text()),
+            float(self.highBreathFreqEdit.text())
+        )
         self.close()
 
     @pyqtSlot()

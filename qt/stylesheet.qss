@@ -131,3 +131,31 @@ QPlainTextEdit {
     background: none;
     border: none;
 }
+
+QTabWidget::pane {
+    border: none;
+    background: white;
+    padding: 0px;
+    margin: 0px;
+}
+
+QTabBar::tab {
+    color: #ababab;
+    border: none;
+    margin: 10px;
+    padding: 5px;
+    border-bottom: 2px solid transparent;
+}
+
+QTabWidget::tab-bar {
+    left: 80px; /* move to the right by 5px */
+}
+
+QTabBar::tab:hover:!selected {
+    border-bottom: 2px solid #ababab;
+}
+
+QTabBar::tab:selected {
+    color: #5961FF;
+    border-bottom: 2px solid #5961FF;
+}

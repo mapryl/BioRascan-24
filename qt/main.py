@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QApplication, QLabel, QWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QLabel,
                              QLineEdit, QCheckBox, QFileDialog, QSpacerItem, QMessageBox, QComboBox, QInputDialog,
-                             QPlainTextEdit)
+                             QPlainTextEdit, QTabWidget)
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtMultimedia import QSoundEffect
@@ -21,13 +21,13 @@ from COMReader import serial_ports
 from pip._internal import exceptions
 
 class RascanWorker(QObject):
-    dataProcessed = pyqtSignal(float, float)
+    dataProcessed = pyqtSignal(float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray )
 
     def __init__(self, parent=None):
         super(self.__class__, self).__init__(parent)
 
-    @QtCore.pyqtSlot(list, list, int)
-    def doWork(self, a_ch0, a_ch1, t_interval):
+    @QtCore.pyqtSlot(list, list, int, tuple)
+    def doWork(self, a_ch0, a_ch1, t_interval, settings):
 
         a_ch0 = np.array(a_ch0)
         a_ch1 = np.array(a_ch1)
@@ -35,12 +35,16 @@ class RascanWorker(QObject):
         a_ch0 = a_ch0 / 8000
         a_ch1 = a_ch1 / 8000
 
-        try:
-            hr, br = breath_rate_counter(a_ch0, a_ch1, t_interval, lowFreqHearth, highFreqHearth, lowFreqBreath, highFreqBreath)
-        except:
-            hr, br = 0, 0
+        lhf, hhf, lbf, hbf = settings
 
-        self.dataProcessed.emit(hr, br)
+        try:
+            hr, br, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2 = \
+                breath_rate_counter(a_ch0, a_ch1, t_interval, lhf, hhf, lbf, hbf)
+        except:
+            hr, br, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2 = \
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+        self.dataProcessed.emit(hr, br, a_ch0, a_ch1, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2)
 
 
 class PlotWidget(pg.GraphicsWindow):
@@ -57,13 +61,12 @@ class PlotWidget(pg.GraphicsWindow):
         self.ptr = 0
 
         font = QFont('roboto')
-        font.setPixelSize(20)
         p.getAxis("bottom").tickFont = font
         p.getAxis("bottom").setStyle(tickTextOffset=30)
         p.getAxis("left").tickFont = font
         p.getAxis("left").setStyle(tickTextOffset=30)
 
-        p.setYRange(0, maxY, padding = 0)
+        #p.setYRange(0, maxY, padding = 0)
 
     def appendPoint(self, value):
         if len(self.data) < self.dataSize:
@@ -75,6 +78,10 @@ class PlotWidget(pg.GraphicsWindow):
             self.ptr += 1
         self.curve.setData(self.data)
         self.curve.setPos(self.ptr, 0)
+
+    def setData(self, data):
+        self.data += data
+        self.curve.setData(self.data)
 
     def reset(self):
         self.data = [0]
@@ -134,7 +141,7 @@ class MyIntValidator(QIntValidator):
         return str(self.min)
 
 class MainWindow(QWidget):
-    processData = pyqtSignal(list, list, int)
+    processData = pyqtSignal(list, list, int, tuple)
     def __init__(self):
         super(self.__class__, self).__init__(None)
 
@@ -151,11 +158,6 @@ class MainWindow(QWidget):
 
         self.createWorkerThread()
 
-        self.heartRatePlotWidget = PlotWidget(150)
-        self.breathRatePlotWidget = PlotWidget(60)
-        self.rightLayout.addWidget(self.heartRatePlotWidget)
-        self.rightLayout.addWidget(self.breathRatePlotWidget)
-
         self.reader.timeUpdate.connect(self.onTimeUpdate)
         self.reader.dataReady.connect(self.onDataReady)
         self.loadSettings()
@@ -166,7 +168,7 @@ class MainWindow(QWidget):
             self.experimentData.appendData(a_ch0, a_ch1, T_meas)
         else:
             self.experimentData.appentDataToTxt(a_ch0, a_ch1, T_meas, self.txtFileName)
-        self.processData.emit(a_ch0, a_ch1, self.intervalLength)
+        self.processData.emit(a_ch0, a_ch1, self.intervalLength, self.settingsWidget.getValues())
 
     @QtCore.pyqtSlot(int)
     def onTimeUpdate(self, time):
@@ -208,9 +210,10 @@ class MainWindow(QWidget):
         leftLayout = QVBoxLayout()
         leftLayout.setSpacing(20)
         mainLayout.addLayout(leftLayout, 1, 1, Qt.AlignCenter)
-        self.rightLayout = QVBoxLayout()
 
-        mainLayout.addLayout(self.rightLayout, 1, 3, Qt.AlignCenter)
+        tabWidget = QTabWidget()
+
+        mainLayout.addWidget(tabWidget, 1, 3, Qt.AlignCenter)
 
         mainLayout.setRowStretch(0, 2)     # empty space above ui
         mainLayout.setRowStretch(1, 1)     # ui
@@ -324,11 +327,43 @@ class MainWindow(QWidget):
         buttonLayout.addWidget(saveButton)
 
         self.startStopButton.toggled.connect(self.onButtonClick)
-        #self.startStopButton.clicked.connect(self.writer.startSend)
+
+        # firs tab
+        tabOneWidget = QWidget()
+        tabOneLayout = QVBoxLayout()
+        tabOneLayout.setContentsMargins(0, 0, 0, 0)
+        tabOneWidget.setLayout(tabOneLayout)
+        tabWidget.addTab(tabOneWidget, "ЧСС/ЧД")
+
+        self.heartRatePlotWidget = PlotWidget(150)
+        self.breathRatePlotWidget = PlotWidget(60)
+        tabOneLayout.addWidget(self.heartRatePlotWidget)
+        tabOneLayout.addWidget(self.breathRatePlotWidget)
+
+        # second tab
+        tabTwoWidget = QWidget()
+        tabTwoLayout = QVBoxLayout()
+        tabTwoWidget.setLayout(tabTwoLayout)
+        tabWidget.addTab(tabTwoWidget, "Сигнал локатора")
+
+        self.locatorPlotWidget = PlotWidget(150)
+        tabTwoLayout.addWidget(self.locatorPlotWidget)
+
+        # third tab
+        tabThreeWidget = QWidget()
+        tabThreeLayout = QVBoxLayout()
+        tabThreeWidget.setLayout(tabThreeLayout)
+        tabWidget.addTab(tabThreeWidget, "Фильтрованный сигнал")
+
+        self.heartFilteredPlotWidget = PlotWidget(150)
+        self.breathFilteredPlotWidget = PlotWidget(60)
+        tabThreeLayout.addWidget(self.heartFilteredPlotWidget)
+        tabThreeLayout.addWidget(self.breathFilteredPlotWidget)
 
     @QtCore.pyqtSlot(bool)
     def onButtonClick(self, toggled):
         if toggled:
+            self.writer.startSend()
             portName = self.comBox.currentText()
             if portName == '':
                 print("Устройство не подключено")
@@ -369,6 +404,7 @@ class MainWindow(QWidget):
             self.heartRatePlotWidget.reset()
             self.breathRatePlotWidget.reset()
         else:
+            self.writer.stopSend()
             self.startStopButton.setText('ЗАПУСК')
             self.reader.stopListen()
 
@@ -376,12 +412,15 @@ class MainWindow(QWidget):
     def onSaveButtonClicked(self):
         self.experimentData.saveToFile()
 
-    @QtCore.pyqtSlot(float, float)
-    def onRascanDataProcessed(self, chss, chd):
+    @QtCore.pyqtSlot(float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray)
+    def onRascanDataProcessed(self, chss, chd, a_ch0, a_ch1, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2):
         self.heartRateText.setText(str(chss))
         self.breathRateText.setText(str(chd))
         self.heartRatePlotWidget.appendPoint(chss)
         self.breathRatePlotWidget.appendPoint(chd)
+        self.locatorPlotWidget.setData(a_ch0.tolist())
+        self.heartFilteredPlotWidget.setData(sig_hf1.tolist())
+        self.breathFilteredPlotWidget.setData(sig_bf1.tolist())
 
     def closeEvent(self, event):
         if (self.saveCheckBox.isChecked()):
@@ -401,6 +440,12 @@ class MainWindow(QWidget):
         settings.setValue("sound", self.soundCheckBox.isChecked())
         settings.setValue("save", self.saveCheckBox.isChecked())
         settings.setValue("port", self.comBox.currentText())
+
+        lhf, hhf, lbf, hbf = self.settingsWidget.getValues()
+        settings.setValue("lhf", lhf)
+        settings.setValue("hhf", hhf)
+        settings.setValue("lbf", lbf)
+        settings.setValue("hbf", hbf)
 
     def loadSettings(self):
         settings = QSettings("BioRascan-24.ini", QSettings.IniFormat);
@@ -428,6 +473,13 @@ class MainWindow(QWidget):
         if (itemIndex != -1):
             self.comBox.setCurrentIndex(itemIndex)
 
+        lhf = settings.value("lhf", 0.7)
+        hhf = settings.value("hhf", 2.5)
+        lbf = settings.value("lbf", 0.01)
+        hbf = settings.value("hbf", 0.4)
+
+        self.settingsWidget.setValues(float(lhf), float(hhf), float(lbf), float(hbf))
+
 app = QApplication([])
 
 # load Google Roboto fonts
@@ -435,6 +487,10 @@ font_db = QFontDatabase()
 font_db.addApplicationFont("/fonts/Roboto-Regular.ttf")
 font_db.addApplicationFont("/fonts/Roboto-Bold.ttf")
 font_db.addApplicationFont("/fonts/Roboto-Thin.ttf")
+
+font = QFont('roboto')
+font.setPixelSize(20)
+app.setFont(font)
 
 # apply Qt stylesheet
 stylesheet = open("stylesheet.qss").read()

@@ -4,7 +4,6 @@ from PyQt5.QtSerialPort import *
 from struct import pack
 import numpy as np
 
-
 class SerialPortWriter(QtCore.QObject):
     def __init__(self):
         super(self.__class__, self).__init__(None)
@@ -39,6 +38,9 @@ class SerialPortWriter(QtCore.QObject):
         #self.port2.open(QIODevice.WriteOnly)
 
         self.timer.start(4)
+
+    def stopSend(self):
+        self.timer.stop()
 
     def onTimeout(self):
         index = self.index % len(self.signal1)
