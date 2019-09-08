@@ -4,11 +4,8 @@
     <list default="true" id="79a54b99-4d37-4538-812d-d3260d89915d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qt/BioRascan-24.ini" beforeDir="false" afterPath="$PROJECT_DIR$/qt/BioRascan-24.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qt/BreathingRateCounter.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/BreathingRateCounter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qt/SerialPortWriter.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/SerialPortWriter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qt/SettingsWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/SettingsWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qt/SerialPortReader.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/SerialPortReader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qt/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qt/stylesheet.qss" beforeDir="false" afterPath="$PROJECT_DIR$/qt/stylesheet.qss" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,19 +27,6 @@
     <expand />
     <select />
   </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/qt/main.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="441">
-              <caret line="491" column="21" selection-start-line="491" selection-start-column="21" selection-end-line="491" selection-end-column="21" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
-  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -50,79 +34,10 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>serial</find>
-      <find>start</find>
-      <find>sta</find>
-      <find>intervalLayoutEdit</find>
-      <find>soundCheckBox</find>
-      <find>OutLog</find>
-      <find>Ras</find>
-      <find>checkBoxLayout</find>
-      <find>initGUI</find>
-      <find>settingsWidget</find>
-      <find>closeEven</find>
-      <find>text</find>
-      <find>lowFreqHearth</find>
-      <find>self.writer</find>
-      <find>processData</find>
-      <find>lowFreqHearthGlobal</find>
-      <find>self.rightLayout</find>
-      <find>dataProcessed</find>
-      <find>onRascanDataProcessed</find>
-    </findStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/qt/COMReader.py" />
-        <option value="$PROJECT_DIR$/qt/SerialPortReader.py" />
-        <option value="$PROJECT_DIR$/qt/fonts/ConsoleWidget.py" />
-        <option value="$PROJECT_DIR$/qt/ConsoleWidget.py" />
-        <option value="$PROJECT_DIR$/qt/OutLog.py" />
-        <option value="$PROJECT_DIR$/qt/SerialPortWriter.py" />
-        <option value="$PROJECT_DIR$/qt/SettingsWidget.py" />
-        <option value="$PROJECT_DIR$/qt/BreathingRateCounter.py" />
-        <option value="$PROJECT_DIR$/qt/stylesheet.qss" />
-        <option value="$PROJECT_DIR$/qt/BioRascan-24.ini" />
-        <option value="$PROJECT_DIR$/qt/main.py" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="105" />
-    <option name="y" value="67" />
-    <option name="width" value="1752" />
-    <option name="height" value="981" />
-  </component>
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="BioRascan-24" type="b2602c69:ProjectViewProjectNode" />
-              <item name="BioRascan-24" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="BioRascan-24" type="b2602c69:ProjectViewProjectNode" />
-              <item name="BioRascan-24" type="462c0819:PsiDirectoryNode" />
-              <item name="qt" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="Scope" />
-    </panes>
-  </component>
+  <component name="ProjectId" id="1QZ03zxmu65mEa48QlhWBwNyCj8" />
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -171,7 +86,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\terenty\PycharmProjects\BioRascan-24\venv\Scripts\python.exe" />
+      <option name="SDK_HOME" value="C:\Users\asi30\AppData\Local\Programs\Python\Python37-32\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/qt" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -199,40 +114,26 @@
       <updated>1562533558763</updated>
       <workItem from="1562533560903" duration="4854000" />
       <workItem from="1562571788270" duration="8380000" />
+      <workItem from="1567962162531" duration="56000" />
+      <workItem from="1567962248426" duration="103000" />
+      <workItem from="1567962622739" duration="34000" />
+      <workItem from="1567962677988" duration="6675000" />
     </task>
     <servers />
   </component>
-  <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="13234000" />
-  </component>
-  <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
-    <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21035941" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.18958743" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.32907662" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.32978722" />
-      <window_info anchor="bottom" id="Python Console" order="12" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="SciView" order="3" />
-      <window_info anchor="right" id="Database" order="4" weight="0.32983023" />
-    </layout>
-  </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -243,159 +144,15 @@
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/qt/BreathingRateCounter.py</url>
-          <line>129</line>
-          <option name="timeStamp" value="16" />
+          <url>file://$PROJECT_DIR$/qt/main.py</url>
+          <line>84</line>
+          <option name="timeStamp" value="18" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Bio_Rascan24$main.coverage" NAME="main Coverage Results" MODIFIED="1562615363445" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/qt" />
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/site-packages/numpy/core/numeric.py" />
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/site-packages/numpy/fft/fftpack.py" />
-    <entry file="file://$PROJECT_DIR$/qt/fonts/ConsoleWidget.py" />
-    <entry file="file://$PROJECT_DIR$/qt/Рисунок1.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/Program Files (x86)/Microsoft Visual Studio/Shared/Python36_64/Lib/codecs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="323" selection-start-line="323" selection-end-line="323" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/PycharmProjects/BioRascan-24/venv/Lib/site-packages/pyqtgraph/graphicsItems/PlotCurveItem.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="665">
-          <caret line="328" selection-start-line="328" selection-end-line="328" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/PycharmProjects/BioRascan-24/venv/Lib/site-packages/pyqtgraph/debug.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="505" selection-start-line="505" selection-end-line="505" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/BreathingRateCounter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="434">
-          <caret line="129" selection-start-line="129" selection-end-line="129" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/PycharmProjects/BioRascan-24/venv/Lib/site-packages/pyqtgraph/graphicsItems/PlotDataItem.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="9256">
-          <caret line="469" selection-start-line="469" selection-end-line="469" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/SerialPortWriter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="975">
-          <caret line="39" column="27" lean-forward="true" selection-start-line="39" selection-start-column="27" selection-end-line="39" selection-end-column="27" />
-          <folding>
-            <element signature="e#0#24#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/SerialPortReader.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="800">
-          <caret line="32" column="8" selection-start-line="32" selection-start-column="8" selection-end-line="32" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#24#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/OutLog.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="550">
-          <caret line="22" selection-start-line="22" selection-end-line="22" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/Work_Script__Read_ads_2rads.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1567" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/stylesheet.qss">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="813">
-          <caret line="146" column="41" lean-forward="true" selection-start-line="146" selection-start-column="41" selection-end-line="146" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/COMReader.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="50">
-          <caret line="2" selection-start-line="2" selection-end-line="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/ConsoleWidget.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="16" column="34" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#42#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/BioRascan-24.ini">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="175">
-          <caret line="7" column="9" selection-start-line="7" selection-start-column="9" selection-end-line="7" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#0#184#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/SettingsWidget.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="32" column="19" lean-forward="true" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#220#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/.npz">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/qt/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="441">
-          <caret line="491" column="21" selection-start-line="491" selection-start-column="21" selection-end-line="491" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
+    <SUITE FILE_PATH="coverage/BioRascan_24$main.coverage" NAME="main Coverage Results" MODIFIED="1567969163021" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/qt" />
   </component>
 </project>

@@ -21,7 +21,7 @@ from COMReader import serial_ports
 from pip._internal import exceptions
 
 class RascanWorker(QObject):
-    dataProcessed = pyqtSignal(float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray )
+    dataProcessed = pyqtSignal(float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray )
 
     def __init__(self, parent=None):
         super(self.__class__, self).__init__(parent)
@@ -43,19 +43,22 @@ class RascanWorker(QObject):
         except:
             hr, br, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2 = \
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-
-        self.dataProcessed.emit(hr, br, a_ch0, a_ch1, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2)
+        sig_hf1 = sig_hf1[::5]
+        sig_hf2 = sig_hf2[::5]
+        sig_bf1 = sig_bf1[::5]
+        sig_bf2 = sig_bf2[::5]
+        self.dataProcessed.emit(hr, br, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2)
 
 
 class PlotWidget(pg.GraphicsWindow):
-    def __init__(self, maxY):
+    def __init__(self, maxX):
         super(self.__class__, self).__init__(None)
 
         self.setWindowTitle('BioRascan-24 plot')
 
         p = self.addPlot()
         self.plot = p
-        self.dataSize = 30
+        self.dataSize = maxX
         self.data = []
         self.curve = p.plot(self.data, pen=pg.mkPen(QColor('#5961FF'), width=2))
         self.ptr = 0
@@ -74,14 +77,21 @@ class PlotWidget(pg.GraphicsWindow):
         else:
             self.data[:-1] = self.data[1:]
             self.data[-1] = value
-
             self.ptr += 1
         self.curve.setData(self.data)
         self.curve.setPos(self.ptr, 0)
 
     def setData(self, data):
-        self.data += data
+        delta = self.dataSize - (len(data) + len(self.data))
+
+        if delta < 0:
+            self.data[:delta] = self.data[-delta:]
+            self.data[delta:] = data
+            self.ptr += -delta
+        else:
+            self.data += data
         self.curve.setData(self.data)
+        self.curve.setPos(self.ptr, 0)
 
     def reset(self):
         self.data = [0]
@@ -146,7 +156,6 @@ class MainWindow(QWidget):
         super(self.__class__, self).__init__(None)
 
         self.reader = SerialPortReader()
-        self.writer = SerialPortWriter()
         self.experimentData = ExperimentData()
 
         self.initGUI()
@@ -160,6 +169,7 @@ class MainWindow(QWidget):
 
         self.reader.timeUpdate.connect(self.onTimeUpdate)
         self.reader.dataReady.connect(self.onDataReady)
+        self.reader.locatorPacket.connect(self.onLocatorPacket)
         self.loadSettings()
 
     @QtCore.pyqtSlot(list, list, list)
@@ -169,6 +179,10 @@ class MainWindow(QWidget):
         else:
             self.experimentData.appentDataToTxt(a_ch0, a_ch1, T_meas, self.txtFileName)
         self.processData.emit(a_ch0, a_ch1, self.intervalLength, self.settingsWidget.getValues())
+
+    @QtCore.pyqtSlot(float, float)
+    def onLocatorPacket(self, val1, val2):
+        self.locatorPlotWidget.appendPoint(val1)
 
     @QtCore.pyqtSlot(int)
     def onTimeUpdate(self, time):
@@ -335,8 +349,8 @@ class MainWindow(QWidget):
         tabOneWidget.setLayout(tabOneLayout)
         tabWidget.addTab(tabOneWidget, "ЧСС/ЧД")
 
-        self.heartRatePlotWidget = PlotWidget(150)
-        self.breathRatePlotWidget = PlotWidget(60)
+        self.heartRatePlotWidget = PlotWidget(30)
+        self.breathRatePlotWidget = PlotWidget(30)
         tabOneLayout.addWidget(self.heartRatePlotWidget)
         tabOneLayout.addWidget(self.breathRatePlotWidget)
 
@@ -346,7 +360,7 @@ class MainWindow(QWidget):
         tabTwoWidget.setLayout(tabTwoLayout)
         tabWidget.addTab(tabTwoWidget, "Сигнал локатора")
 
-        self.locatorPlotWidget = PlotWidget(150)
+        self.locatorPlotWidget = PlotWidget(300)
         tabTwoLayout.addWidget(self.locatorPlotWidget)
 
         # third tab
@@ -355,15 +369,14 @@ class MainWindow(QWidget):
         tabThreeWidget.setLayout(tabThreeLayout)
         tabWidget.addTab(tabThreeWidget, "Фильтрованный сигнал")
 
-        self.heartFilteredPlotWidget = PlotWidget(150)
-        self.breathFilteredPlotWidget = PlotWidget(60)
+        self.heartFilteredPlotWidget = PlotWidget(300)
+        self.breathFilteredPlotWidget = PlotWidget(300)
         tabThreeLayout.addWidget(self.heartFilteredPlotWidget)
         tabThreeLayout.addWidget(self.breathFilteredPlotWidget)
 
     @QtCore.pyqtSlot(bool)
     def onButtonClick(self, toggled):
         if toggled:
-            self.writer.startSend()
             portName = self.comBox.currentText()
             if portName == '':
                 print("Устройство не подключено")
@@ -403,8 +416,10 @@ class MainWindow(QWidget):
             self.reader.startListen(self.intervalLength, portName)
             self.heartRatePlotWidget.reset()
             self.breathRatePlotWidget.reset()
+            self.breathFilteredPlotWidget.reset()
+            self.heartFilteredPlotWidget.reset()
+            self.locatorPlotWidget.reset()
         else:
-            self.writer.stopSend()
             self.startStopButton.setText('ЗАПУСК')
             self.reader.stopListen()
 
@@ -412,13 +427,12 @@ class MainWindow(QWidget):
     def onSaveButtonClicked(self):
         self.experimentData.saveToFile()
 
-    @QtCore.pyqtSlot(float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray)
-    def onRascanDataProcessed(self, chss, chd, a_ch0, a_ch1, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2):
+    @QtCore.pyqtSlot(float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray)
+    def onRascanDataProcessed(self, chss, chd, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2):
         self.heartRateText.setText(str(chss))
         self.breathRateText.setText(str(chd))
         self.heartRatePlotWidget.appendPoint(chss)
         self.breathRatePlotWidget.appendPoint(chd)
-        self.locatorPlotWidget.setData(a_ch0.tolist())
         self.heartFilteredPlotWidget.setData(sig_hf1.tolist())
         self.breathFilteredPlotWidget.setData(sig_bf1.tolist())
 

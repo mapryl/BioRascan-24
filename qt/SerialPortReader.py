@@ -12,6 +12,7 @@ import time
 
 class SerialPortReader(QtCore.QObject):
     dataReady = pyqtSignal(list, list, list)
+    locatorPacket = pyqtSignal(float, float)
     timeUpdate = pyqtSignal(int)
 
     def __init__(self):
@@ -66,6 +67,8 @@ class SerialPortReader(QtCore.QObject):
 
             self.T_ms += self.dt_ms;
             self.T_meas.append(self.T_ms)
+
+            self.locatorPacket.emit(a0_mV, a1_mV)
 
             if self.T_ms % self.dataReadyInterval == 0:
                 self.dataReady.emit(self.a_ch0, self.a_ch1, self.T_meas)
