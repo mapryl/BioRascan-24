@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="79a54b99-4d37-4538-812d-d3260d89915d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/BioRascan-24_last.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BioRascan-24_last.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qt/BioRascan-24.ini" beforeDir="false" afterPath="$PROJECT_DIR$/qt/BioRascan-24.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qt/SerialPortReader.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/SerialPortReader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qt/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -42,7 +43,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -86,7 +87,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\asi30\AppData\Local\Programs\Python\Python37-32\python.exe" />
+      <option name="SDK_HOME" value="D:\Users\Alina2\Desktop\BioRascan-24\venv\Scripts\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/qt" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -118,6 +119,10 @@
       <workItem from="1567962248426" duration="103000" />
       <workItem from="1567962622739" duration="34000" />
       <workItem from="1567962677988" duration="6675000" />
+      <workItem from="1568023824325" duration="117000" />
+      <workItem from="1568024002772" duration="344000" />
+      <workItem from="1568041207339" duration="20084000" />
+      <workItem from="1568216944255" duration="952000" />
     </task>
     <servers />
   </component>
@@ -129,7 +134,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
@@ -143,16 +150,11 @@
           <line>95</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/qt/main.py</url>
-          <line>84</line>
-          <option name="timeStamp" value="18" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Bio_Rascan24$main.coverage" NAME="main Coverage Results" MODIFIED="1562615363445" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/qt" />
-    <SUITE FILE_PATH="coverage/BioRascan_24$main.coverage" NAME="main Coverage Results" MODIFIED="1567969163021" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/qt" />
+    <SUITE FILE_PATH="coverage/BioRascan_24$main.coverage" NAME="main Coverage Results" MODIFIED="1568217779775" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/qt" />
   </component>
 </project>

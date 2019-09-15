@@ -10,6 +10,7 @@ from SerialPortWriter import *
 from ConsoleWidget import ConsoleWidget
 from SettingsWidget import SettingsWidget
 from OutLog import OutLog
+from itertools import filterfalse
 
 import pyqtgraph as pg
 import numpy as np
@@ -47,61 +48,115 @@ class RascanWorker(QObject):
         sig_hf2 = sig_hf2[::5]
         sig_bf1 = sig_bf1[::5]
         sig_bf2 = sig_bf2[::5]
+        peaks_hf1 = peaks_hf1 / 5
+        peaks_hf2 = peaks_hf2 / 5
+        peaks_bf1 = peaks_bf1 / 5
+        peaks_bf2 = peaks_bf2 / 5
         self.dataProcessed.emit(hr, br, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2)
 
-
 class PlotWidget(pg.GraphicsWindow):
-    def __init__(self, maxX):
+    def __init__(self, maxX, plotCount = 1):
         super(self.__class__, self).__init__(None)
 
-        self.setWindowTitle('BioRascan-24 plot')
-
-        p = self.addPlot()
-        self.plot = p
+        self.initPlots(plotCount)
         self.dataSize = maxX
-        self.data = []
-        self.curve = p.plot(self.data, pen=pg.mkPen(QColor('#5961FF'), width=2))
-        self.ptr = 0
 
         font = QFont('roboto')
-        p.getAxis("bottom").tickFont = font
-        p.getAxis("bottom").setStyle(tickTextOffset=30)
-        p.getAxis("left").tickFont = font
-        p.getAxis("left").setStyle(tickTextOffset=30)
+        self.plot.getAxis("bottom").tickFont = font
+        self.plot.getAxis("bottom").setStyle(tickTextOffset=30)
+        self.plot.getAxis("left").tickFont = font
+        self.plot.getAxis("left").setStyle(tickTextOffset=30)
 
         #p.setYRange(0, maxY, padding = 0)
 
-    def appendPoint(self, value):
-        if len(self.data) < self.dataSize:
-            self.data.append(value)
-        else:
-            self.data[:-1] = self.data[1:]
-            self.data[-1] = value
-            self.ptr += 1
-        self.curve.setData(self.data)
-        self.curve.setPos(self.ptr, 0)
+    def initPlots(self, plotCount):
+        self.plot = self.addPlot()
 
-    def setData(self, data):
-        delta = self.dataSize - (len(data) + len(self.data))
+        self.pens = []
+        self.pens.append(pg.mkPen(QColor('#5961FF'), width=2))
+        self.pens.append(pg.mkPen(QColor('#FF1776'), width=2))
+
+        self.plotCount = plotCount
+        self.curves = []
+        self.datas = []
+        self.ptrs = []
+        self.hides = []
+
+        for i in range(plotCount):
+            self.curves.append([pg.PlotCurveItem(pen=self.pens[i]), pg.ScatterPlotItem(pen=self.pens[i])])
+            self.plot.addItem(self.curves[i][0])
+            self.plot.addItem(self.curves[i][1])
+            self.datas.append([[],[]])
+            self.ptrs.append(0)
+            self.hides.append(False)
+
+    def hideCurve(self, curveNumber, hide):
+        if hide:
+            self.hides[curveNumber] = True
+            self.curves[curveNumber][0].setData([0])
+            self.curves[curveNumber][0].setData([])
+        else:
+            self.hides[curveNumber] = False
+            self.curves[curveNumber][0].setData(self.datas[curveNumber][0])
+            self.curves[curveNumber][0].setPos(self.ptrs[curveNumber], 0)
+
+    def appendPoint(self, curveNumber, value):
+        if len(self.datas[curveNumber][0]) < self.dataSize:
+            self.datas[curveNumber][0].append(value)
+        else:
+            self.datas[curveNumber][0][:-1] = self.datas[curveNumber][0][1:]
+            self.datas[curveNumber][0][-1] = value
+            self.ptrs[curveNumber] += 1
+
+        if not self.hides[curveNumber]:
+            self.curves[curveNumber][0].setData(self.datas[curveNumber][0])
+
+        self.curves[curveNumber][0].setPos(self.ptrs[curveNumber], 0)
+
+    def appendData(self, curveNumber, data, peaks=[]):
+        delta = self.dataSize - (len(data) + len(self.datas[curveNumber][0]))
 
         if delta < 0:
-            self.data[:delta] = self.data[-delta:]
-            self.data[delta:] = data
-            self.ptr += -delta
+            self.datas[curveNumber][0][:delta] = self.datas[curveNumber][0][-delta:]
+            self.datas[curveNumber][0][delta:] = data
+            self.ptrs[curveNumber] += -delta
         else:
-            self.data += data
-        self.curve.setData(self.data)
-        self.curve.setPos(self.ptr, 0)
+            self.datas[curveNumber][0] += data
+
+        if not self.hides[curveNumber]:
+            self.curves[curveNumber][0].setData(self.datas[curveNumber][0])
+
+        self.curves[curveNumber][0].setPos(self.ptrs[curveNumber], 0)
+
+        self.appendPeaks(curveNumber, data, peaks)
+
+    def appendPeaks(self, curveNumber, data, peaks):
+        self.datas[curveNumber][1][:] = [x for x in self.datas[curveNumber][1] if x['pos'][0] >= self.ptrs[curveNumber]]
+
+        dataBegin = len(self.datas[curveNumber][0])-len(data) + self.ptrs[curveNumber]
+
+        for index, item in enumerate(peaks):
+            roundedItem = int(item + 0.5)
+            roundedItem = min(roundedItem, len(data) - 1)
+            self.datas[curveNumber][1].append({'pos': (dataBegin + roundedItem, data[roundedItem])})
+
+        self.curves[curveNumber][1].setData(self.datas[curveNumber][1])
+
+    def resetOne(self, curveNumber):
+        self.datas[curveNumber][0] = [0]
+        self.ptrs[curveNumber] = 0
+        self.curves[curveNumber][0].setData(self.datas[curveNumber][0])
+        self.curves[curveNumber][0].setPos(self.ptrs[curveNumber], 0)
+        self.datas[curveNumber][0] = []
+        self.ptrs[curveNumber] = 0
+        self.curves[curveNumber][0].setData(self.datas[curveNumber][0])
+        self.curves[curveNumber][0].setPos(self.ptrs[curveNumber], 0)
+        self.datas[curveNumber][1] = []
+        self.curves[curveNumber][1].clear()
 
     def reset(self):
-        self.data = [0]
-        self.ptr = 0
-        self.curve.setData(self.data)
-        self.curve.setPos(self.ptr, 0)
-        self.data = []
-        self.ptr = 0
-        self.curve.setData(self.data)
-        self.curve.setPos(self.ptr, 0)
+        for i in range(self.plotCount):
+            self.resetOne(i)
 
 class ExperimentData:
     def __init__(self):
@@ -182,7 +237,8 @@ class MainWindow(QWidget):
 
     @QtCore.pyqtSlot(float, float)
     def onLocatorPacket(self, val1, val2):
-        self.locatorPlotWidget.appendPoint(val1)
+        self.locatorPlotWidget.appendPoint(0, val1)
+        self.locatorPlotWidget.appendPoint(1, val2)
 
     @QtCore.pyqtSlot(int)
     def onTimeUpdate(self, time):
@@ -360,8 +416,19 @@ class MainWindow(QWidget):
         tabTwoWidget.setLayout(tabTwoLayout)
         tabWidget.addTab(tabTwoWidget, "Сигнал локатора")
 
-        self.locatorPlotWidget = PlotWidget(300)
+        self.locatorPlotWidget = PlotWidget(300, 2)
         tabTwoLayout.addWidget(self.locatorPlotWidget)
+
+        tabOneButtonsLayout = QGridLayout()
+        tabTwoLayout.addLayout(tabOneButtonsLayout)
+        locatorLeftCheckBox = QCheckBox('1-ая квадратура')
+        tabOneButtonsLayout.addWidget(locatorLeftCheckBox, 0, 3)
+        locatorRightCheckBox = QCheckBox('2-ая квадратура')
+        tabOneButtonsLayout.addWidget(locatorRightCheckBox, 1, 3)
+        locatorLeftCheckBox.setChecked(True)
+        locatorRightCheckBox.setChecked(True)
+        locatorLeftCheckBox.stateChanged.connect(lambda state: self.locatorPlotWidget.hideCurve(0, False if state == 1 or state == 2 else True))
+        locatorRightCheckBox.stateChanged.connect(lambda state: self.locatorPlotWidget.hideCurve(1, False if state == 1 or state == 2 else True))
 
         # third tab
         tabThreeWidget = QWidget()
@@ -369,8 +436,8 @@ class MainWindow(QWidget):
         tabThreeWidget.setLayout(tabThreeLayout)
         tabWidget.addTab(tabThreeWidget, "Фильтрованный сигнал")
 
-        self.heartFilteredPlotWidget = PlotWidget(300)
-        self.breathFilteredPlotWidget = PlotWidget(300)
+        self.heartFilteredPlotWidget = PlotWidget(300, 2)
+        self.breathFilteredPlotWidget = PlotWidget(300, 2)
         tabThreeLayout.addWidget(self.heartFilteredPlotWidget)
         tabThreeLayout.addWidget(self.breathFilteredPlotWidget)
 
@@ -429,12 +496,14 @@ class MainWindow(QWidget):
 
     @QtCore.pyqtSlot(float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray)
     def onRascanDataProcessed(self, chss, chd, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2):
-        self.heartRateText.setText(str(chss))
-        self.breathRateText.setText(str(chd))
-        self.heartRatePlotWidget.appendPoint(chss)
-        self.breathRatePlotWidget.appendPoint(chd)
-        self.heartFilteredPlotWidget.setData(sig_hf1.tolist())
-        self.breathFilteredPlotWidget.setData(sig_bf1.tolist())
+        self.heartRateText.setText(str(int(chss)))
+        self.breathRateText.setText(str(int(chd)))
+        self.heartRatePlotWidget.appendPoint(0, chss)
+        self.breathRatePlotWidget.appendPoint(0, chd)
+        self.heartFilteredPlotWidget.appendData(0, sig_hf1.tolist(), peaks_hf1.tolist())
+        self.heartFilteredPlotWidget.appendData(1, sig_hf2.tolist(), peaks_hf2.tolist())
+        self.breathFilteredPlotWidget.appendData(0, sig_bf1.tolist(), peaks_bf1.tolist())
+        self.breathFilteredPlotWidget.appendData(1, sig_bf2.tolist(), peaks_bf2.tolist())
 
     def closeEvent(self, event):
         if (self.saveCheckBox.isChecked()):
