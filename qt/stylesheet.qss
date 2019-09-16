@@ -53,7 +53,7 @@ QPushButton#secondary {
 	font: bold;
 	padding: 20px;
 	margin: 0px;
-	max-width: 160px;
+	max-width: 240px;
 	min-width: 160px;
 }
 

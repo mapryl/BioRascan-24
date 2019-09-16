@@ -344,7 +344,7 @@ class MainWindow(QWidget):
         self.settingsButton = QPushButton('ДОПОЛНИТЕЛЬНО')
         self.settingsButton.setObjectName('secondary')
         settingsLayout.addWidget(self.settingsButton, 4, 2, 2, 2, Qt.AlignLeft)
-        self.settingsButton.clicked.connect(lambda : self.settingsWidget.open())
+        self.settingsButton.clicked.connect(lambda: self.settingsWidget.open())
 
         self.timeLabel = QLabel('00:00:00')
         self.timeLabel.setObjectName('timeLabel')
@@ -434,7 +434,7 @@ class MainWindow(QWidget):
         tabThreeWidget = QWidget()
         tabThreeLayout = QVBoxLayout()
         tabThreeWidget.setLayout(tabThreeLayout)
-        tabWidget.addTab(tabThreeWidget, "Фильтрованный сигнал")
+        tabWidget.addTab(tabThreeWidget, "Отфильтрованный сигнал")
 
         self.heartFilteredPlotWidget = PlotWidget(300, 2)
         self.breathFilteredPlotWidget = PlotWidget(300, 2)
