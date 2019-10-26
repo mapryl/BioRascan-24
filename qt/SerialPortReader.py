@@ -65,7 +65,7 @@ class SerialPortReader(QtCore.QObject):
             self.a_ch0.append(a0_mV)
             self.a_ch1.append(a1_mV)
 
-            self.T_ms += self.dt_ms;
+            self.T_ms += self.dt_ms
             self.T_meas.append(self.T_ms)
 
             self.locatorPacket.emit(a0_mV, a1_mV)

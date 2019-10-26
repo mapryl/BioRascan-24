@@ -54,11 +54,30 @@ class RascanWorker(QObject):
         peaks_bf2 = peaks_bf2 / 5
         self.dataProcessed.emit(hr, br, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2)
 
+
+class MyAxis(pg.AxisItem):
+    def __init__(self, delta, orientation):
+        super().__init__(orientation)
+
+        self.delta = delta
+
+    def setDelta(self, delta):
+        self.delta = delta
+
+    def tickStrings(self, values, scale, spacing):
+        strings = []
+        for v in values:
+            vs = v * scale * self.delta / 1000
+            str_val = str( round(vs, 1) )
+            strings.append(str_val)
+        return strings
+
+
 class PlotWidget(pg.GraphicsWindow):
-    def __init__(self, maxX, plotCount = 1):
+    def __init__(self, maxX, deltaX, plotCount):
         super(self.__class__, self).__init__(None)
 
-        self.initPlots(plotCount)
+        self.initPlots(deltaX, plotCount)
         self.dataSize = maxX
 
         font = QFont('roboto')
@@ -69,8 +88,12 @@ class PlotWidget(pg.GraphicsWindow):
 
         #p.setYRange(0, maxY, padding = 0)
 
-    def initPlots(self, plotCount):
-        self.plot = self.addPlot()
+    def setDelta(self, delta):
+        self.my_axis.setDelta(delta)
+
+    def initPlots(self, deltaX, plotCount):
+        self.my_axis = MyAxis(deltaX, orientation='bottom')
+        self.plot = self.addPlot(axisItems={'bottom': self.my_axis})
 
         self.pens = []
         self.pens.append(pg.mkPen(QColor('#5961FF'), width=2))
@@ -158,8 +181,9 @@ class PlotWidget(pg.GraphicsWindow):
         for i in range(self.plotCount):
             self.resetOne(i)
 
-class ExperimentData:
-    def __init__(self):
+class ExperimentData():
+    def __init__(self, parent):
+        self.parent = parent
         self.reset()
 
     def appendData(self, a_ch0, a_ch1, T_meas):
@@ -182,7 +206,7 @@ class ExperimentData:
 
     def saveIfNeeded(self):
         if self.needToSave:
-            answer = QMessageBox.question(None, "Сообщение",
+            answer = QMessageBox.question(self.parent, "Сообщение",
                                           "Имеются несохраненные данные, сохранить?",
                                           QMessageBox.Yes, QMessageBox.No)
             if answer == QMessageBox.Yes:
@@ -211,7 +235,7 @@ class MainWindow(QWidget):
         super(self.__class__, self).__init__(None)
 
         self.reader = SerialPortReader()
-        self.experimentData = ExperimentData()
+        self.experimentData = ExperimentData(self)
 
         self.initGUI()
 
@@ -405,8 +429,8 @@ class MainWindow(QWidget):
         tabOneWidget.setLayout(tabOneLayout)
         tabWidget.addTab(tabOneWidget, "ЧСС/ЧД")
 
-        self.heartRatePlotWidget = PlotWidget(30)
-        self.breathRatePlotWidget = PlotWidget(30)
+        self.heartRatePlotWidget = PlotWidget(30, 10000, 1)
+        self.breathRatePlotWidget = PlotWidget(30, 10000, 1)
         tabOneLayout.addWidget(self.heartRatePlotWidget)
         tabOneLayout.addWidget(self.breathRatePlotWidget)
 
@@ -416,7 +440,7 @@ class MainWindow(QWidget):
         tabTwoWidget.setLayout(tabTwoLayout)
         tabWidget.addTab(tabTwoWidget, "Сигнал локатора")
 
-        self.locatorPlotWidget = PlotWidget(300, 2)
+        self.locatorPlotWidget = PlotWidget(300, 20, 2)
         tabTwoLayout.addWidget(self.locatorPlotWidget)
 
         tabOneButtonsLayout = QGridLayout()
@@ -436,8 +460,8 @@ class MainWindow(QWidget):
         tabThreeWidget.setLayout(tabThreeLayout)
         tabWidget.addTab(tabThreeWidget, "Отфильтрованный сигнал")
 
-        self.heartFilteredPlotWidget = PlotWidget(300, 2)
-        self.breathFilteredPlotWidget = PlotWidget(300, 2)
+        self.heartFilteredPlotWidget = PlotWidget(300, 100, 2)
+        self.breathFilteredPlotWidget = PlotWidget(300, 100, 2)
         tabThreeLayout.addWidget(self.heartFilteredPlotWidget)
         tabThreeLayout.addWidget(self.breathFilteredPlotWidget)
 
@@ -457,6 +481,11 @@ class MainWindow(QWidget):
             self.startStopButton.setText('СТОП')
             self.intervalLength = int(self.intervalLayoutEdit.text())
             self.experimentLength = int(self.lengthSettingsEdit.text())
+            if self.experimentLength < self.intervalLength / 60:
+                print("Интервал расчета больше длительности эксперимента.")
+                self.startStopButton.setChecked(False)
+                self.startStopButton.setText('ЗАПУСК')
+                return
             if self.experimentLength >= 5:
                 txtFileName, ok = QInputDialog.getText(self, 'Ввод имени файла',
                                                        'Длительность эксперимента более 5 минут\n\n'
@@ -477,15 +506,16 @@ class MainWindow(QWidget):
                     return
 
             print("Подождите, программа запускается...")
-            if self.experimentLength < self.intervalLength / 60:
-                print("Интервал расчета больше длительности эксперимента.\n"
-                      "Расчет ЧСС и ЧД не производится. Осуществляется запись в файл.")
             self.reader.startListen(self.intervalLength, portName)
             self.heartRatePlotWidget.reset()
             self.breathRatePlotWidget.reset()
             self.breathFilteredPlotWidget.reset()
             self.heartFilteredPlotWidget.reset()
             self.locatorPlotWidget.reset()
+            self.heartRatePlotWidget.setDelta(self.intervalLength * 1000)
+            self.breathRatePlotWidget.setDelta(self.intervalLength * 1000)
+            self.heartRatePlotWidget.appendPoint(0, 0)
+            self.breathRatePlotWidget.appendPoint(0, 0)
         else:
             self.startStopButton.setText('ЗАПУСК')
             self.reader.stopListen()
@@ -586,5 +616,3 @@ mainWindow = MainWindow()
 mainWindow.show()
 
 app.exec_()
-
-

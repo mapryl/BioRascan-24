@@ -1,6 +1,7 @@
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
+
 class OutLog(QObject):
     printSignal = pyqtSignal(str, 'QColor')
 
@@ -14,13 +15,13 @@ class OutLog(QObject):
         self.color = color
 
         if not self.color:
-            self.color = QColor('#a0a0a0') # default color
+            self.color = QColor('#a0a0a0')  # default color
 
     def write(self, msg):
-         self.printSignal.emit(msg, self.color)
+        self.printSignal.emit(msg, self.color)
 
-         if self.old_out:
-             self.old_out.write(msg)
+        if self.old_out:
+            self.old_out.write(msg)
 
     def flush(self):
         pass
