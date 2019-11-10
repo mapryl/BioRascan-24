@@ -236,6 +236,9 @@ class MainWindow(QWidget):
 
         self.reader = SerialPortReader()
         self.experimentData = ExperimentData(self)
+        self.receivingStarted = False
+        self.recordingStarted = False
+        self.recordingTime = 0
 
         self.initGUI()
 
@@ -253,10 +256,11 @@ class MainWindow(QWidget):
 
     @QtCore.pyqtSlot(list, list, list)
     def onDataReady(self, a_ch0, a_ch1, T_meas):
-        if self.experimentLength < 5:
-            self.experimentData.appendData(a_ch0, a_ch1, T_meas)
-        else:
-            self.experimentData.appentDataToTxt(a_ch0, a_ch1, T_meas, self.txtFileName)
+        if self.recordingStarted:
+            if self.experimentLength < 5:
+                self.experimentData.appendData(a_ch0, a_ch1, T_meas)
+            else:
+                self.experimentData.appentDataToTxt(a_ch0, a_ch1, T_meas, self.txtFileName)
         self.processData.emit(a_ch0, a_ch1, self.intervalLength, self.settingsWidget.getValues())
 
     @QtCore.pyqtSlot(float, float)
@@ -266,11 +270,15 @@ class MainWindow(QWidget):
 
     @QtCore.pyqtSlot(int)
     def onTimeUpdate(self, time):
-        time = self.experimentLength*60*1000 - time
-        qtTime = QTime.fromMSecsSinceStartOfDay(time)
+        if not self.recordingStarted:
+            return
+
+        self.recordingTime += time
+        remainingTime = self.experimentLength*60*1000 - self.recordingTime
+        qtTime = QTime.fromMSecsSinceStartOfDay(remainingTime)
         self.timeLabel.setText(qtTime.toString())
 
-        if time == 0:
+        if remainingTime == 0:
             self.startStopButton.toggle()
             if self.soundCheckBox.isChecked():
                 self.sound.play()
@@ -414,37 +422,26 @@ class MainWindow(QWidget):
         leftLayout.addLayout(buttonLayout)
         self.startStopButton = QPushButton('ЗАПУСК')
         self.startStopButton.setCheckable(True)
-        saveButton = QPushButton('СОХРАНИТЬ')
-        saveButton.clicked.connect(self.onSaveButtonClicked)
+        self.saveButton = QPushButton('ЗАПИСЬ')
+        self.saveButton.setCheckable(True)
         buttonLayout.addWidget(self.startStopButton)
         buttonLayout.addSpacing(20)
-        buttonLayout.addWidget(saveButton)
+        buttonLayout.addWidget(self.saveButton)
 
+        self.saveButton.toggled.connect(self.onSaveButtonClicked)
         self.startStopButton.toggled.connect(self.onButtonClick)
 
         # firs tab
         tabOneWidget = QWidget()
         tabOneLayout = QVBoxLayout()
-        tabOneLayout.setContentsMargins(0, 0, 0, 0)
         tabOneWidget.setLayout(tabOneLayout)
-        tabWidget.addTab(tabOneWidget, "ЧСС/ЧД")
-
-        self.heartRatePlotWidget = PlotWidget(30, 10000, 1)
-        self.breathRatePlotWidget = PlotWidget(30, 10000, 1)
-        tabOneLayout.addWidget(self.heartRatePlotWidget)
-        tabOneLayout.addWidget(self.breathRatePlotWidget)
-
-        # second tab
-        tabTwoWidget = QWidget()
-        tabTwoLayout = QVBoxLayout()
-        tabTwoWidget.setLayout(tabTwoLayout)
-        tabWidget.addTab(tabTwoWidget, "Сигнал локатора")
+        tabWidget.addTab(tabOneWidget, "Сигнал локатора")
 
         self.locatorPlotWidget = PlotWidget(300, 20, 2)
-        tabTwoLayout.addWidget(self.locatorPlotWidget)
+        tabOneLayout.addWidget(self.locatorPlotWidget)
 
         tabOneButtonsLayout = QGridLayout()
-        tabTwoLayout.addLayout(tabOneButtonsLayout)
+        tabOneLayout.addLayout(tabOneButtonsLayout)
         locatorLeftCheckBox = QCheckBox('1-ая квадратура')
         tabOneButtonsLayout.addWidget(locatorLeftCheckBox, 0, 3)
         locatorRightCheckBox = QCheckBox('2-ая квадратура')
@@ -453,6 +450,19 @@ class MainWindow(QWidget):
         locatorRightCheckBox.setChecked(True)
         locatorLeftCheckBox.stateChanged.connect(lambda state: self.locatorPlotWidget.hideCurve(0, False if state == 1 or state == 2 else True))
         locatorRightCheckBox.stateChanged.connect(lambda state: self.locatorPlotWidget.hideCurve(1, False if state == 1 or state == 2 else True))
+
+        # second tab
+        tabTwoWidget = QWidget()
+        tabTwoLayout = QVBoxLayout()
+        tabTwoLayout.setContentsMargins(0, 0, 0, 0)
+        tabTwoWidget.setLayout(tabTwoLayout)
+        tabWidget.addTab(tabTwoWidget, "ЧСС/ЧД")
+
+        self.heartRatePlotWidget = PlotWidget(30, 10000, 1)
+
+        self.breathRatePlotWidget = PlotWidget(30, 10000, 1)
+        tabTwoLayout.addWidget(self.heartRatePlotWidget)
+        tabTwoLayout.addWidget(self.breathRatePlotWidget)
 
         # third tab
         tabThreeWidget = QWidget()
@@ -475,17 +485,38 @@ class MainWindow(QWidget):
                 self.startStopButton.setChecked(False)
                 self.startStopButton.blockSignals(False)
                 return
-            if self.saveCheckBox.isChecked():
-                self.experimentData.saveIfNeeded()
-            self.experimentData.reset()
+
+            self.startStopButton.setText('ЗАПУСК')
+            print("Подождите, программа запускается...")
+
+            self.intervalLength = int(self.intervalLayoutEdit.text())
+            self.reader.startListen(self.intervalLength, portName)
+            self.locatorPlotWidget.reset()
+            self.receivingStarted = True
+        else:
             self.startStopButton.setText('СТОП')
+            self.reader.stopListen()
+            self.saveButton.setChecked(False)
+            self.receivingStarted = False
+
+    @QtCore.pyqtSlot(bool)
+    def onSaveButtonClicked(self, toggled):
+        if toggled:
+            if not self.receivingStarted:
+                print("Прием не начат")
+                self.saveButton.blockSignals(True)
+                self.saveButton.setChecked(False)
+                self.saveButton.blockSignals(False)
+                return
+
+            self.recordingTime = 0
+            self.experimentData.reset()
+            self.saveButton.setText('СОХРАНИТЬ')
+
             self.intervalLength = int(self.intervalLayoutEdit.text())
             self.experimentLength = int(self.lengthSettingsEdit.text())
             if self.experimentLength < self.intervalLength / 60:
                 print("Интервал расчета больше длительности эксперимента.")
-                self.startStopButton.setChecked(False)
-                self.startStopButton.setText('ЗАПУСК')
-                return
             if self.experimentLength >= 5:
                 txtFileName, ok = QInputDialog.getText(self, 'Ввод имени файла',
                                                        'Длительность эксперимента более 5 минут\n\n'
@@ -497,32 +528,34 @@ class MainWindow(QWidget):
                         open(txtFileName + '.txt', 'w').close()
                     except OSError:
                         print("Неправильное имя файла")
-                        self.startStopButton.setChecked(False)
-                        self.startStopButton.setText('ЗАПУСК')
+                        self.saveButton.setChecked(False)
+                        self.saveButton.setText('СОХРАНИТЬ')
                         return
                 else:
-                    self.startStopButton.setChecked(False)
-                    self.startStopButton.setText('ЗАПУСК')
+                    self.saveButton.setChecked(False)
+                    self.saveButton.setText('СОХРАНИТЬ')
                     return
+            self.recordingStarted = True
 
-            print("Подождите, программа запускается...")
-            self.reader.startListen(self.intervalLength, portName)
             self.heartRatePlotWidget.reset()
             self.breathRatePlotWidget.reset()
             self.breathFilteredPlotWidget.reset()
             self.heartFilteredPlotWidget.reset()
-            self.locatorPlotWidget.reset()
             self.heartRatePlotWidget.setDelta(self.intervalLength * 1000)
             self.breathRatePlotWidget.setDelta(self.intervalLength * 1000)
             self.heartRatePlotWidget.appendPoint(0, 0)
             self.breathRatePlotWidget.appendPoint(0, 0)
-        else:
-            self.startStopButton.setText('ЗАПУСК')
-            self.reader.stopListen()
 
-    @QtCore.pyqtSlot()
-    def onSaveButtonClicked(self):
-        self.experimentData.saveToFile()
+            self.reader.startIntervalSending(self.intervalLength)
+            print("Запись данных начата")
+            qtTime = QTime.fromMSecsSinceStartOfDay(self.experimentLength * 60 * 1000)
+            self.timeLabel.setText(qtTime.toString())
+        else:
+            self.recordingStarted = False
+            print("Запись данных окончена")
+            self.experimentData.saveToFile()
+            self.saveButton.setText('ЗАПИСЬ')
+            self.timeLabel.setText('00:00:00')
 
     @QtCore.pyqtSlot(float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray)
     def onRascanDataProcessed(self, chss, chd, sig_hf1, sig_hf2, peaks_hf1, peaks_hf2, sig_bf1, sig_bf2, peaks_bf1, peaks_bf2):

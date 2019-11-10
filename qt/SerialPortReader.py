@@ -25,12 +25,9 @@ class SerialPortReader(QtCore.QObject):
         self.dt_ms = 20
 
         self.port1 = QSerialPort()
-        self.port2 = QSerialPort()
-
         self.port1.readyRead.connect(self.OnPortRead)
-        self.port2.readyRead.connect(self.OnPortRead)
 
-    @QtCore.pyqtSlot(int)
+    @QtCore.pyqtSlot(int, int)
     def startListen(self, dataReadyInterval, portName):
         self.fullReset()
         self.dataReadyInterval = dataReadyInterval * 1000
@@ -53,14 +50,21 @@ class SerialPortReader(QtCore.QObject):
         self.timer.stop()
         self.port1.write(b'0')
         self.port1.close()
+        self.intervalSending = False
         print("Регистрация окончена")
+
+    @QtCore.pyqtSlot(int)
+    def startIntervalSending(self, dataReadyInterval):
+        self.dataReadyInterval = dataReadyInterval * 1000
+        self.fullReset()
 
     @QtCore.pyqtSlot()
     def OnPortRead(self):
-        # print(self.port1.bytesAvailable(), self.port2.bytesAvailable())
         while self.port1.bytesAvailable() > 4:
             a0_mV = (unpack('<H', self.port1.read(2))[0])  # ads voltage = 2 bytes
             a1_mV = (unpack('<H', self.port1.read(2))[0])
+
+            self.locatorPacket.emit(a0_mV, a1_mV)
 
             self.a_ch0.append(a0_mV)
             self.a_ch1.append(a1_mV)
@@ -68,14 +72,12 @@ class SerialPortReader(QtCore.QObject):
             self.T_ms += self.dt_ms
             self.T_meas.append(self.T_ms)
 
-            self.locatorPacket.emit(a0_mV, a1_mV)
-
             if self.T_ms % self.dataReadyInterval == 0:
                 self.dataReady.emit(self.a_ch0, self.a_ch1, self.T_meas)
                 self.reset()
 
             if self.T_ms % 1000 == 0:
-                self.timeUpdate.emit(self.T_ms)
+                self.timeUpdate.emit(1000)
 
     def reset(self):
         self.a_ch0 = []
