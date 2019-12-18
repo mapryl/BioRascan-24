@@ -10,7 +10,8 @@ from SerialPortWriter import *
 from ConsoleWidget import ConsoleWidget
 from SettingsWidget import SettingsWidget
 from OutLog import OutLog
-from itertools import filterfalse
+
+from SerialPortWriter import SerialPortWriter
 
 import pyqtgraph as pg
 import numpy as np
@@ -80,7 +81,7 @@ class PlotWidget(pg.GraphicsWindow):
         self.initPlots(deltaX, plotCount)
         self.dataSize = maxX
 
-        font = QFont('roboto')
+        font = QFont('Roboto')
         self.plot.getAxis("bottom").tickFont = font
         self.plot.getAxis("bottom").setStyle(tickTextOffset=30)
         self.plot.getAxis("left").tickFont = font
@@ -220,6 +221,7 @@ class ExperimentData():
                                 T=self.T_meas)
             self.needToSave = False
 
+
 class MyIntValidator(QIntValidator):
     def __init__(self, min, max):
         super(self.__class__, self).__init__(min, max)
@@ -228,6 +230,7 @@ class MyIntValidator(QIntValidator):
     def fixup(self, s):
         print("Задано значение вне допустимого диапазона")
         return str(self.min)
+
 
 class MainWindow(QWidget):
     processData = pyqtSignal(list, list, int, tuple)
@@ -254,6 +257,8 @@ class MainWindow(QWidget):
         self.reader.locatorPacket.connect(self.onLocatorPacket)
         self.loadSettings()
 
+        #self.writer = SerialPortWriter()
+
     @QtCore.pyqtSlot(list, list, list)
     def onDataReady(self, a_ch0, a_ch1, T_meas):
         if self.recordingStarted:
@@ -279,9 +284,9 @@ class MainWindow(QWidget):
         self.timeLabel.setText(qtTime.toString())
 
         if remainingTime == 0:
-            self.startStopButton.toggle()
             if self.soundCheckBox.isChecked():
                 self.sound.play()
+            self.startStopButton.toggle()
 
     def createWorkerThread(self):
         self.rascanWorker = RascanWorker()
@@ -370,12 +375,9 @@ class MainWindow(QWidget):
         self.soundCheckBox = QCheckBox('Звуковое оповещение')
         settingsLayout.addWidget(self.soundCheckBox, 4, 0)
 
-        self.saveCheckBox = QCheckBox('Запрос на сохранение')
-        settingsLayout.addWidget(self.saveCheckBox, 5, 0)
-
         self.settingsButton = QPushButton('ДОПОЛНИТЕЛЬНО')
         self.settingsButton.setObjectName('secondary')
-        settingsLayout.addWidget(self.settingsButton, 4, 2, 2, 2, Qt.AlignLeft)
+        settingsLayout.addWidget(self.settingsButton, 4, 2, 1, 2, Qt.AlignLeft)
         self.settingsButton.clicked.connect(lambda: self.settingsWidget.open())
 
         self.timeLabel = QLabel('00:00:00')
@@ -478,45 +480,54 @@ class MainWindow(QWidget):
     @QtCore.pyqtSlot(bool)
     def onButtonClick(self, toggled):
         if toggled:
+            #self.writer.startSend()
             portName = self.comBox.currentText()
             if portName == '':
                 print("Устройство не подключено")
-                self.startStopButton.blockSignals(True)
-                self.startStopButton.setChecked(False)
-                self.startStopButton.blockSignals(False)
+                self.uncheck(self.startStopButton)
                 return
 
-            self.startStopButton.setText('ЗАПУСК')
             print("Подождите, программа запускается...")
 
             self.intervalLength = int(self.intervalLayoutEdit.text())
-            self.reader.startListen(self.intervalLength, portName)
+
+            try:
+                self.reader.startListen(self.intervalLength, portName)
+            except IOError:
+                print("Не удается открыть указанный COM порт")
+                self.uncheck(self.startStopButton)
+                return
+
             self.locatorPlotWidget.reset()
+            self.startStopButton.setText('СТОП')
             self.receivingStarted = True
         else:
-            self.startStopButton.setText('СТОП')
+            #self.writer.stopSend()
+            self.startStopButton.setText('ЗАПУСК')
             self.reader.stopListen()
             self.saveButton.setChecked(False)
             self.receivingStarted = False
+
+    def uncheck(self, button):
+        button.blockSignals(True)
+        button.setChecked(False)
+        button.blockSignals(False)
 
     @QtCore.pyqtSlot(bool)
     def onSaveButtonClicked(self, toggled):
         if toggled:
             if not self.receivingStarted:
                 print("Прием не начат")
-                self.saveButton.blockSignals(True)
-                self.saveButton.setChecked(False)
-                self.saveButton.blockSignals(False)
+                self.uncheck(self.saveButton)
                 return
-
-            self.recordingTime = 0
-            self.experimentData.reset()
-            self.saveButton.setText('СОХРАНИТЬ')
 
             self.intervalLength = int(self.intervalLayoutEdit.text())
             self.experimentLength = int(self.lengthSettingsEdit.text())
             if self.experimentLength < self.intervalLength / 60:
-                print("Интервал расчета больше длительности эксперимента.")
+                print("Интервал расчета больше длительности эксперимента")
+                self.uncheck(self.saveButton)
+                return
+
             if self.experimentLength >= 5:
                 txtFileName, ok = QInputDialog.getText(self, 'Ввод имени файла',
                                                        'Длительность эксперимента более 5 минут\n\n'
@@ -528,13 +539,16 @@ class MainWindow(QWidget):
                         open(txtFileName + '.txt', 'w').close()
                     except OSError:
                         print("Неправильное имя файла")
-                        self.saveButton.setChecked(False)
-                        self.saveButton.setText('СОХРАНИТЬ')
+                        self.uncheck(self.saveButton)
                         return
                 else:
-                    self.saveButton.setChecked(False)
-                    self.saveButton.setText('СОХРАНИТЬ')
+                    self.uncheck(self.saveButton)
                     return
+
+            self.recordingTime = 0
+            self.experimentData.reset()
+            self.saveButton.setText('СОХРАНИТЬ')
+
             self.recordingStarted = True
 
             self.heartRatePlotWidget.reset()
@@ -569,8 +583,7 @@ class MainWindow(QWidget):
         self.breathFilteredPlotWidget.appendData(1, sig_bf2.tolist(), peaks_bf2.tolist())
 
     def closeEvent(self, event):
-        if (self.saveCheckBox.isChecked()):
-            self.experimentData.saveIfNeeded()
+        self.experimentData.saveIfNeeded()
         self.saveSettings()
         event.accept()
 
@@ -584,7 +597,6 @@ class MainWindow(QWidget):
         settings.setValue("length", self.lengthSettingsEdit.text())
         settings.setValue("interval", self.intervalLayoutEdit.text())
         settings.setValue("sound", self.soundCheckBox.isChecked())
-        settings.setValue("save", self.saveCheckBox.isChecked())
         settings.setValue("port", self.comBox.currentText())
 
         lhf, hhf, lbf, hbf = self.settingsWidget.getValues()
@@ -611,9 +623,6 @@ class MainWindow(QWidget):
         if (settings.value("sound", False) == "true"):
             self.soundCheckBox.setChecked(True)
 
-        if (settings.value("save", True) == "true"):
-            self.saveCheckBox.setChecked(True)
-
         portName = settings.value("port", "")
         itemIndex = self.comBox.findText(portName)
         if (itemIndex != -1):
@@ -630,11 +639,11 @@ app = QApplication([])
 
 # load Google Roboto fonts
 font_db = QFontDatabase()
-font_db.addApplicationFont("/fonts/Roboto-Regular.ttf")
-font_db.addApplicationFont("/fonts/Roboto-Bold.ttf")
-font_db.addApplicationFont("/fonts/Roboto-Thin.ttf")
+font_db.addApplicationFont("./fonts/Roboto-Regular.ttf")
+font_db.addApplicationFont("./fonts/Roboto-Bold.ttf")
+font_db.addApplicationFont("./fonts/Roboto-Thin.ttf")
 
-font = QFont('roboto')
+font = QFont('Roboto')
 font.setPixelSize(20)
 app.setFont(font)
 

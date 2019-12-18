@@ -14,7 +14,7 @@ class SerialPortWriter(QtCore.QObject):
 
         self.timer.timeout.connect(self.onTimeout)
 
-        rad = np.load('Demkin_br_Rad1_1.npz')
+        rad = np.load('Andreeva_br_Rad1_1.npz')
         self.time = rad["T"]
         self.signal1 = rad["ch0"]
         self.signal2 = rad["ch1"]
@@ -27,8 +27,7 @@ class SerialPortWriter(QtCore.QObject):
 
     @QtCore.pyqtSlot()
     def startSend(self):
-        print("dsfgsdgf")
-        self.port1.setPortName('COM6')
+        self.port1.setPortName('COM10')
         self.port1.setBaudRate(QSerialPort.Baud38400)
 
         #self.port2.setPortName('COM7')

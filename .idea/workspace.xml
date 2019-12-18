@@ -2,15 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="79a54b99-4d37-4538-812d-d3260d89915d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/BioRascan-24_last.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BioRascan-24_last.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qt/.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qt/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/qt/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qt/BioRascan-24.ini" beforeDir="false" afterPath="$PROJECT_DIR$/qt/BioRascan-24.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qt/BreathingRateCounter.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/BreathingRateCounter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qt/SerialPortWriter.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/SerialPortWriter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qt/SettingsWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/SettingsWidget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qt/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/qt/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qt/stylesheet.qss" beforeDir="false" afterPath="$PROJECT_DIR$/qt/stylesheet.qss" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,25 +42,24 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1QZ03zxmu65mEa48QlhWBwNyCj8" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="BioRascan-24_last" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -104,6 +104,45 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="xvxv.npz" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="BioRascan-24_last" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\asi30\AppData\Local\Programs\Python\Python37-32\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.." />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qt/xvxv.npz" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.xvxv.npz" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -127,6 +166,12 @@
       <workItem from="1568216944255" duration="952000" />
       <workItem from="1568629808209" duration="29000" />
       <workItem from="1568629903740" duration="1149000" />
+      <workItem from="1576172566119" duration="7383000" />
+      <workItem from="1576502568039" duration="1839000" />
+      <workItem from="1576599011056" duration="3004000" />
+      <workItem from="1576604166597" duration="1210000" />
+      <workItem from="1576694148210" duration="24000" />
+      <workItem from="1576694182840" duration="1951000" />
     </task>
     <servers />
   </component>
@@ -146,6 +191,33 @@
       </map>
     </option>
   </component>
+  <component name="WindowStateProjectService">
+    <state x="321" y="80" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1576694166595">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="321" y="80" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1280.680@0.0.1280.680" timestamp="1576694166595" />
+    <state width="1237" height="75" key="GridCell.Tab.0.bottom" timestamp="1576695809264">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1237" height="75" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1576695809264" />
+    <state width="1237" height="75" key="GridCell.Tab.0.center" timestamp="1576695809263">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1237" height="75" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1576695809263" />
+    <state width="1237" height="75" key="GridCell.Tab.0.left" timestamp="1576695809263">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1237" height="75" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1576695809263" />
+    <state width="1237" height="75" key="GridCell.Tab.0.right" timestamp="1576695809264">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1237" height="75" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1576695809264" />
+    <state x="437" y="224" key="com.intellij.ide.util.TipDialog" timestamp="1576694184401">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="437" y="224" key="com.intellij.ide.util.TipDialog/0.0.1280.680@0.0.1280.680" timestamp="1576694184401" />
+    <state x="656" y="343" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1576604167905" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -156,14 +228,20 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/qt/main.py</url>
-          <line>344</line>
-          <option name="timeStamp" value="7" />
+          <line>496</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/qt/SettingsWidget.py</url>
+          <line>119</line>
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/BioRascan_24$xvxv_npz.coverage" NAME="xvxv.npz Coverage Results" MODIFIED="1576695296701" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/.." />
+    <SUITE FILE_PATH="coverage/BioRascan_24$main.coverage" NAME="main Coverage Results" MODIFIED="1576695809255" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/qt" />
     <SUITE FILE_PATH="coverage/Bio_Rascan24$main.coverage" NAME="main Coverage Results" MODIFIED="1562615363445" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/qt" />
-    <SUITE FILE_PATH="coverage/BioRascan_24$main.coverage" NAME="main Coverage Results" MODIFIED="1568631104193" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/qt" />
   </component>
 </project>

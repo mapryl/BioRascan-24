@@ -1,5 +1,5 @@
 QWidget{
-	font-family: roboto;
+	font-family: Roboto;
 	font-size: 12pt;
 	background-color: #FFFFFF;
 	outline: none;

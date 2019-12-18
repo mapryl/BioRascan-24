@@ -129,6 +129,11 @@ def breath_rate_counter(signal_r1_1, signal_r1_2, time, lowFreqHearth, highFreqH
     total_heart_rate = (len(peaks_hb_r1_1) + len(peaks_hb_r1_2)) / 2
     total_heart_rate = total_heart_rate / time * 60
 
+    if abs(min(signal_r1_1) - max(signal_r1_1)) < 0.015:
+        total_heart_rate = 0
+        total_breath_rate = 0
+        peaks_br_r1_1, peaks_br_r1_2, peaks_hb_r1_1, peaks_hb_r1_2 = [np.array([]) for i in range(4)]
+
     return total_heart_rate, total_breath_rate, \
            signalfilt_hb_r1_1, signalfilt_hb_r1_2, peaks_hb_r1_1,  peaks_hb_r1_2, \
            signalfilt_br_r1_1, signalfilt_br_r1_2, peaks_br_r1_1, peaks_br_r1_2
